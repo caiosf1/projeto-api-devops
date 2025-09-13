@@ -1,0 +1,31 @@
+name: CI/CD Pipeline - Build e push da Imagem Docker
+# O gatilho: define QUANDO o robô deve executar
+on:
+    # O evento principal é o 'push'
+    push:
+        # E só nos importamos com pushes para a branch 'main'
+        branches: ['main']
+
+jobs:
+    build-e-push-imagem:
+        # A "mesa de trabalho" do robô: pedimos ao Github uma máquina virtual nova com o Ubuntu
+        runs-on: ubuntu-latest
+        steps:
+            # Passo 1: Baixar nosso código para dentro da máquina virtual do robô
+
+            - name: 1.Checkout do código
+              uses: actions/checkout@v4
+
+            - name: 2. Login no Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username:${{secrets.DOCKERHUB_USERNAME}}
+                password:${{secrets.DOCKERHUB_TOKEN}}
+            
+            - name: 3. Build and Push da Imagem Docker
+              uses: docker/build-push-action@v5
+              with:
+                context: .
+                push: true
+                tags: caiosfdev/api-tarefas:latest
+    

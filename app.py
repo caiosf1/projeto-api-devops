@@ -79,4 +79,4 @@ def deletar_tarefas(id):
 
 #5. O "Interruptor": este bloco fazer o servidor de fato rodar quando executamos o arquivo
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
