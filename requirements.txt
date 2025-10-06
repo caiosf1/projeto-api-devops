@@ -1,2 +1,11 @@
 Flask
 requests
+SQLAlchemy
+psycopg2-binary
+Flask-SQLAlchemy
+python-dotenv
+Flask-Migrate
+pydantic
+Flask-JWT-Extended
+Flask-Bcrypt
+flask-restx

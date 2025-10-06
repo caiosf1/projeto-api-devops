@@ -1,0 +1,30 @@
+version: '3.8' # Versão da especificação do docker-compose
+
+services:
+  api:
+    build: . # Constrói a imagem a partir do Dockerfile no diretório atual
+    ports:
+      - "5000:5000" # Expõe a porta 5000 do container na porta 5000 do host
+    env_file:
+      - .env # Carrega variáveis de ambiente do arquivo .env
+    depends_on:
+      db:
+        condition: service_healthy # Só inicia a API depois que o banco estiver saudável
+
+  db:
+    image: postgres:15-alpine # Usa a imagem oficial do PostgreSQL (versão 15, mais leve - alpine)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Volume gerenciado pelo Docker para os dados do banco
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U caio -d apitodo" ] # Teste de saúde: checa se o Postgres está pronto
+      interval: 5s # Checa a cada 5 segundos
+      timeout: 5s # Tempo máximo de resposta
+      retries: 5 # Quantas vezes tentar antes de marcar como "unhealthy"
+    environment:
+      - POSTGRES_USER=caio # Usuário do banco
+      - POSTGRES_PASSWORD=minhasenha # Senha do banco
+      - POSTGRES_DB=apitodo # Banco que será criado automaticamente
+
+# Definição dos volumes nomeados
+volumes:
+  postgres_data: # O Docker vai criar e gerenciar esse volume automaticamente
