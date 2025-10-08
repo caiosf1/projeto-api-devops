@@ -49,6 +49,17 @@ migrate = Migrate(app, db)
 
 
 class Tarefa(db.Model):
+    """
+    Modelo de dados para uma Tarefa.
+
+    Representa uma tarefa no banco de dados.
+
+    Attributes:
+        id (int): O identificador único da tarefa.
+        descricao (str): A descrição textual da tarefa.
+        concluida (bool): O estado da tarefa (concluída ou não).
+        prioridade (str): A prioridade da tarefa (e.g., 'baixa', 'media', 'alta').
+    """
     id = db.Column(db.Integer, primary_key=True)
     descricao = db.Column(db.String(200), nullable=False)
     concluida = db.Column(db.Boolean, default=False)
@@ -56,6 +67,16 @@ class Tarefa(db.Model):
 
 
 class Usuario(db.Model):
+    """
+    Modelo de dados para um Usuário.
+
+    Representa um usuário do sistema no banco de dados.
+
+    Attributes:
+        id (int): O identificador único do usuário.
+        email (str): O email do usuário, usado para login e identificação.
+        senha (str): A senha hash do usuário.
+    """
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     senha = db.Column(db.String(200), nullable=False)
@@ -97,11 +118,23 @@ modelo_tarefa_input = ns_tarefas.model('TarefaInput', {
 
 @ns_auth.route('/register')
 class RegistroResource(Resource):
+    """
+    Recurso para registrar um novo usuário no sistema.
+    """
     @ns_auth.expect(modelo_registro)
     @ns_auth.response(201, 'Usuário criado com sucesso!')
     @ns_auth.response(409, 'Este email já está em uso')
     def post(self):
-        """Registra um novo usuário."""
+        """
+        Cria um novo usuário.
+
+        Recebe um email e senha, verifica se o email já existe,
+        cria um hash da senha e salva o novo usuário no banco de dados.
+
+        Returns:
+            tuple: Uma tupla contendo um dicionário com uma mensagem de sucesso e o código de status HTTP 201,
+                   ou um dicionário com uma mensagem de erro e o código de status HTTP 409.
+        """
         dados = request.get_json()
         email = dados.get('email')
         senha = dados.get('senha')
@@ -118,9 +151,20 @@ class RegistroResource(Resource):
 
 @ns_auth.route('/login')
 class LoginResource(Resource):
+    """
+    Recurso para autenticar um usuário e obter um token JWT.
+    """
     @ns_auth.expect(modelo_login)
     def post(self):
-        """Autentica um usuário e retorna um token JWT."""
+        """
+        Autentica um usuário.
+
+        Recebe um email e senha, verifica as credenciais e, se forem válidas,
+        retorna um token de acesso JWT.
+
+        Returns:
+            dict: Um dicionário contendo o token de acesso ou uma mensagem de erro.
+        """
         dados = request.get_json()
         email = dados.get('email')
         senha = dados.get('senha')
@@ -136,15 +180,32 @@ class LoginResource(Resource):
 @ns_tarefas.route('/')
 @ns_tarefas.doc(security='jwt')
 class ListaDeTarefasResource(Resource):
+    """
+    Recurso para listar todas as tarefas e criar novas tarefas.
+    """
     @ns_tarefas.marshal_list_with(modelo_tarefa_output)
     def get(self):
-        """Lista todas as tarefas"""
+        """
+        Lista todas as tarefas existentes.
+
+        Returns:
+            list: Uma lista de objetos de tarefa.
+        """
         return Tarefa.query.all()
 
     @ns_tarefas.expect(modelo_tarefa_input)
     @ns_tarefas.marshal_with(modelo_tarefa_output, code=201)
     def post(self):
-        """Cria uma nova tarefa"""
+        """
+        Cria uma nova tarefa.
+
+        Valida os dados de entrada usando `TarefaCreateSchema`, cria a tarefa
+        e a salva no banco de dados.
+
+        Returns:
+            tuple: Uma tupla contendo o objeto da nova tarefa e o código de status HTTP 201,
+                   ou um dicionário de erros e o código de status HTTP 400 em caso de falha na validação.
+        """
         dados = api.payload
         try:
             tarefa_validada = TarefaCreateSchema(**dados)
@@ -161,14 +222,33 @@ class ListaDeTarefasResource(Resource):
 @ns_tarefas.route('/<int:id>')
 @ns_tarefas.doc(security='jwt', params={'id': 'O ID da Tarefa'})
 class TarefaResource(Resource):
+    """
+    Recurso para operar sobre uma tarefa individual (buscar, atualizar, deletar).
+    """
     @ns_tarefas.marshal_with(modelo_tarefa_output)
     def get(self, id):
-        """Busca uma tarefa pelo seu ID."""
+        """
+        Busca uma tarefa pelo seu ID.
+
+        Args:
+            id (int): O ID da tarefa a ser buscada.
+
+        Returns:
+            object: O objeto da tarefa correspondente ao ID.
+        """
         return Tarefa.query.get_or_404(id)
 
     @ns_tarefas.marshal_with(modelo_tarefa_output)
     def put(self, id):
-        """Atualiza o status de uma tarefa para 'concluída'."""
+        """
+        Atualiza o status de uma tarefa para 'concluída'.
+
+        Args:
+            id (int): O ID da tarefa a ser atualizada.
+
+        Returns:
+            object: O objeto da tarefa atualizada.
+        """
         tarefa = Tarefa.query.get_or_404(id)
         tarefa.concluida = True
         db.session.commit()
@@ -176,7 +256,15 @@ class TarefaResource(Resource):
 
     @ns_tarefas.response(204, 'Tarefa deletada com sucesso')
     def delete(self, id):
-        """Deleta uma tarefa."""
+        """
+        Deleta uma tarefa.
+
+        Args:
+            id (int): O ID da tarefa a ser deletada.
+
+        Returns:
+            tuple: Uma tupla vazia com o código de status HTTP 204.
+        """
         tarefa = Tarefa.query.get_or_404(id)
         db.session.delete(tarefa)
         db.session.commit()
