@@ -9,3 +9,4 @@ pydantic
 Flask-JWT-Extended
 Flask-Bcrypt
 flask-restx
+pytest
