@@ -230,25 +230,29 @@ Banco de Dados (PostgreSQL)
 
 **Integração e Deploy Contínuos** com GitHub Actions - automatiza testes e build a cada mudança no código:
 
-### Como Funciona:
+### 📋 Como Funciona:
 
-```
-1. Desenvolvedor faz push do código
-   ↓
-2. GitHub Actions detecta mudança
-   ↓
-3. INTEGRAÇÃO CONTÍNUA (CI):
-   ├─ Instala dependências Python
-   ├─ Roda 12 testes automatizados (pytest)
-   └─ ✅ Testes passaram? → Continua
-       ❌ Testes falharam? → PARA AQUI (não faz deploy de código quebrado)
-   ↓
-4. BUILD & DEPLOY (CD):
-   ├─ Constrói imagem Docker da aplicação
-   └─ Publica no Docker Hub (pronta para uso)
-```
+**1️⃣ Desenvolvedor faz push do código**  
+↓
 
-**Benefício:** Garante que apenas código testado e funcionando vai para produção.
+**2️⃣ GitHub Actions detecta a mudança automaticamente**  
+↓
+
+**3️⃣ INTEGRAÇÃO CONTÍNUA (CI)**
+- 🔧 Instala dependências Python
+- 🧪 Roda 12 testes automatizados (pytest)
+- ✅ **Testes passaram?** → Continua para próxima etapa
+- ❌ **Testes falharam?** → PARA AQUI (não faz deploy de código quebrado)
+
+↓
+
+**4️⃣ BUILD & DEPLOY (CD)**
+- 🐳 Constrói imagem Docker da aplicação
+- 📦 Publica no Docker Hub (pronta para deploy em produção)
+
+---
+
+💡 **Benefício:** Garante que apenas código testado e funcionando vai para produção, automatizando todo o processo de build e validação.
 
 ---
 
