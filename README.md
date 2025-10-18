@@ -266,7 +266,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 **Caio Santos**
 
 - GitHub: [@caiosf1](https://github.com/caiosf1)
-- LinkedIn: [Seu LinkedIn](https://linkedin.com/in/seu-perfil)
+- LinkedIn: [Caio Santos](https://www.linkedin.com/in/caio-santos-555119247/)
 
 ---
 
