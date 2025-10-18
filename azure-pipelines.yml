@@ -1,0 +1,164 @@
+# ===================================================================================
+# Azure DevOps Pipeline - CI/CD Completo
+# ===================================================================================
+# Este pipeline executa testes, build Docker e deploy automático na Azure
+# Configurado para demonstrar conhecimento em DevOps para vaga Deloitte
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - README.md
+      - FRONTEND.md
+      - AZURE.md
+      - .gitignore
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  pythonVersion: '3.9'
+  dockerRegistryServiceConnection: 'DockerHubConnection'
+  imageRepository: 'caiosfdev/api-tarefas'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+stages:
+  # ===================================================================================
+  # STAGE 1: Testes e Qualidade do Código
+  # ===================================================================================
+  - stage: Test
+    displayName: 'Tests and Quality'
+    jobs:
+      - job: UnitTests
+        displayName: 'Run Unit Tests'
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python $(pythonVersion)'
+
+          - script: |
+              echo "📦 Installing dependencies..."
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              pip install pytest pytest-cov pytest-html
+            displayName: 'Install dependencies'
+
+          - script: |
+              echo "🧪 Running tests..."
+              pytest tests/ \
+                --junitxml=junit/test-results.xml \
+                --cov=app \
+                --cov-report=xml \
+                --cov-report=html \
+                --html=pytest-report.html \
+                --self-contained-html \
+                -v
+            displayName: 'Run tests with pytest'
+
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFiles: '**/test-results.xml'
+              testRunTitle: 'Python $(pythonVersion) - Unit Tests'
+              failTaskOnFailedTests: true
+            displayName: 'Publish test results'
+
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: Cobertura
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+              reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+            displayName: 'Publish code coverage'
+
+          - publish: $(System.DefaultWorkingDirectory)/pytest-report.html
+            artifact: test-report
+            displayName: 'Publish test HTML report'
+
+  # ===================================================================================
+  # STAGE 2: Build e Push Docker Image
+  # ===================================================================================
+  - stage: Build
+    displayName: 'Build Docker Image'
+    dependsOn: Test
+    condition: succeeded()
+    jobs:
+      - job: DockerBuild
+        displayName: 'Build and Push Docker'
+        steps:
+          - task: Docker@2
+            displayName: 'Build Docker Image'
+            inputs:
+              command: build
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              tags: |
+                $(tag)
+                latest
+              arguments: '--no-cache'
+
+          - task: Docker@2
+            displayName: 'Login to Docker Hub'
+            inputs:
+              command: login
+              containerRegistry: $(dockerRegistryServiceConnection)
+
+          - task: Docker@2
+            displayName: 'Push to Docker Hub'
+            inputs:
+              command: push
+              repository: $(imageRepository)
+              tags: |
+                $(tag)
+                latest
+
+          - script: |
+              echo "✅ Docker image built and pushed successfully!"
+              echo "📦 Image: $(imageRepository):$(tag)"
+              echo "📦 Latest: $(imageRepository):latest"
+            displayName: 'Build summary'
+
+  # ===================================================================================
+  # STAGE 3: Deploy para Azure App Service (Production)
+  # ===================================================================================
+  - stage: Deploy
+    displayName: 'Deploy to Azure'
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeployProduction
+        displayName: 'Deploy to Production'
+        environment: 'production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureWebAppContainer@1
+                  displayName: 'Deploy to Azure App Service'
+                  inputs:
+                    azureSubscription: 'AzureServiceConnection'
+                    appName: 'api-tarefas-app'
+                    containers: '$(imageRepository):$(tag)'
+                    
+                - script: |
+                    echo "🚀 Application deployed successfully!"
+                    echo "🌐 URL: https://api-tarefas-app.azurewebsites.net"
+                    echo "📚 Docs: https://api-tarefas-app.azurewebsites.net/docs"
+                  displayName: 'Deployment summary'
+
+# ===================================================================================
+# Notas de Configuração:
+# ===================================================================================
+# 1. Criar Service Connection 'DockerHubConnection' no Azure DevOps
+# 2. Criar Service Connection 'AzureServiceConnection' para Azure
+# 3. Criar environment 'production' no Azure DevOps
+# 4. Configurar variáveis de ambiente no App Service:
+#    - SECRET_KEY
+#    - JWT_SECRET_KEY
+#    - POSTGRES_USER
+#    - POSTGRES_PASSWORD
+#    - POSTGRES_DB
+#    - POSTGRES_HOST

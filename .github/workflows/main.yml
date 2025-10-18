@@ -5,15 +5,31 @@ on:
     push:
         # E só nos importamos com pushes para a branch 'main'
         branches: ['main']
-
 jobs:
-    build-e-push-imagem:
-        # A "mesa de trabalho" do robô: pedimos ao Github uma máquina virtual nova com o Ubuntu
+    test:
         runs-on: ubuntu-latest
         steps:
-            # Passo 1: Baixar nosso código para dentro da máquina virtual do robô
+            - name: 1. Checkout do código
+              uses: actions/checkout@v4
 
-            - name: 1.Checkout do código
+            - name: 2. Configurar Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.9'
+
+            - name: 3. Instalar dependências
+              run: |
+                pip install -r requirements.txt
+                pip install pytest # Instala a dependência de teste
+
+            - name: 4. Rodar os testes com Pytest
+              run: pytest
+
+    build-e-push-imagem:
+        runs-on: ubuntu-latest
+        needs: test # Este job só roda se o job 'test' passar
+        steps:
+            - name: 1. Checkout do código
               uses: actions/checkout@v4
 
             - name: 2. Login no Docker Hub

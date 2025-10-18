@@ -1,2 +1,152 @@
+# ================================
+# PYTHON
+# ================================
+# Bytecode compilado
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Ambientes virtuais
 venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Instalação e distribuição
+pip-log.txt
+pip-delete-this-directory.txt
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Testes e cobertura
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+*.cover
+htmlcov/
+.hypothesis/
+*.mo
+*.pot
+
+# ================================
+# AMBIENTE E SECRETS
+# ================================
 .env
+.env.local
+.env.*.local
+secrets.json
+*.pem
+*.key
+
+# ================================
+# BANCO DE DADOS
+# ================================
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# ================================
+# IDE
+# ================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+
+# ================================
+# LOGS
+# ================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ================================
+# CACHE
+# ================================
+.cache/
+.mypy_cache/
+.dmypy.json
+.pyre/
+.ruff_cache/
+.pytype/
+.pdm.toml
+
+# ================================
+# DOCUMENTAÇÃO DE APRENDIZADO
+# (Mantém projeto limpo no GitHub)
+# ================================
+
+# Guias de aprendizado (básicos)
+COMECE_AQUI.md
+INICIO_RAPIDO.md
+LOGICA_PROGRAMACAO_DO_ZERO.md
+GLOSSARIO_COMPLETO.md
+GUIA_DE_ESTUDO.md
+TRILHA_FOR_LOOPS.md
+
+# Guias técnicos (sessões)
+COMANDOS_LINUX.md
+COMANDOS.md
+COMANDOS_PRONTOS.md
+GIT_GITHUB.md
+GIT_CHECKLIST.md
+AZURE_CONTA_SERVICOS.md
+DOCKER_COMPOSE_GUIA.md
+ALGORITMOS_ESTRUTURAS_DADOS.md
+
+# Guias de frontend
+FRONTEND.md
+FRONTEND_SIMPLES.md
+FRONTEND_BOOTSTRAP.md
+FRONTEND_FRAMEWORK.md
+
+# Resumos e análises
+REVISAO_PROJETO.md
+RESUMO_FINAL.md
+SESSAO_6_RESUMO.md
+ARQUIVOS_CRIADOS.md
+COMMIT_AGORA.md
+CHECKLIST.md
+
+# Índices
+INDICE_MESTRE.md
+INDICE_MESTRE_ATUALIZADO.md
+
+# Exercícios (pasta completa)
+exercicios/
+
+# Código em texto (snapshots)
+codigo_projeto_txt/
+
+# ================================
+# OUTROS
+# ================================
+# Docker
+.dockerignore
+
+# Temporários
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Jupyter Notebooks (se usar no futuro)
+.ipynb_checkpoints/
+*.ipynb
