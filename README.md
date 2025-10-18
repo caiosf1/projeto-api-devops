@@ -263,7 +263,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👤 Autor
 
-**Caio Ferreira**
+**Caio Santos**
 
 - GitHub: [@caiosf1](https://github.com/caiosf1)
 - LinkedIn: [Seu LinkedIn](https://linkedin.com/in/seu-perfil)
