@@ -228,14 +228,27 @@ Banco de Dados (PostgreSQL)
 
 ## 🚀 CI/CD Pipeline
 
-**GitHub Actions** executa automaticamente a cada push:
+**Integração e Deploy Contínuos** com GitHub Actions - automatiza testes e build a cada mudança no código:
+
+### Como Funciona:
 
 ```
-git push → GitHub Actions → Testes (pytest) → Build Docker → Deploy
+1. Desenvolvedor faz push do código
+   ↓
+2. GitHub Actions detecta mudança
+   ↓
+3. INTEGRAÇÃO CONTÍNUA (CI):
+   ├─ Instala dependências Python
+   ├─ Roda 12 testes automatizados (pytest)
+   └─ ✅ Testes passaram? → Continua
+       ❌ Testes falharam? → PARA AQUI (não faz deploy de código quebrado)
+   ↓
+4. BUILD & DEPLOY (CD):
+   ├─ Constrói imagem Docker da aplicação
+   └─ Publica no Docker Hub (pronta para uso)
 ```
 
-✅ Se os testes passarem → Build da imagem Docker  
-❌ Se os testes falharem → Pipeline interrompido
+**Benefício:** Garante que apenas código testado e funcionando vai para produção.
 
 ---
 
