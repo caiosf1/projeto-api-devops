@@ -1,6 +1,6 @@
-# 📋 API de Gerenciamento de Tarefas
+# 📋 Gerenciador de Tarefas Full-Stack
 
-> API RESTful completa com autenticação JWT, validação de dados e arquitetura DevOps
+> Sistema completo de gerenciamento de tarefas com backend Flask e frontend Bootstrap 5
 
 [![CI/CD Pipeline](https://github.com/caiosf1/projeto-api-devops/actions/workflows/main.yml/badge.svg)](https://github.com/caiosf1/projeto-api-devops/actions)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
@@ -11,41 +11,50 @@
 
 ## 🎯 Sobre o Projeto
 
-Este projeto é uma **API RESTful** desenvolvida em Python com Flask, focada em demonstrar boas práticas de desenvolvimento backend e DevOps. A aplicação implementa um sistema completo de gerenciamento de tarefas (To-Do List) com autenticação JWT, validação de dados, containerização e CI/CD automatizado.
+Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvida como projeto de estudos em desenvolvimento web e DevOps. O sistema permite que usuários criem contas, façam login e gerenciem suas tarefas com diferentes níveis de prioridade através de uma interface web moderna e responsiva.
 
-### 🌟 Principais Características
+### 🌟 O Que Foi Implementado
 
-- ✅ **Autenticação JWT** - Sistema seguro de login e autorização
-- ✅ **CRUD Completo** - Create, Read, Update, Delete de tarefas
-- ✅ **Validação de Dados** - Usando Pydantic para garantir integridade
-- ✅ **Documentação Automática** - Swagger/OpenAPI integrado
-- ✅ **Containerização** - Docker e Docker Compose
-- ✅ **CI/CD** - Pipeline automatizado com GitHub Actions
-- ✅ **Testes Automatizados** - Suite de testes com pytest
-- ✅ **Migrações de Banco** - Controle de versão do schema com Alembic
+**Backend (API REST):**
+- ✅ **Autenticação JWT** - Login seguro com tokens
+- ✅ **CRUD de Tarefas** - Criar, listar, atualizar e deletar
+- ✅ **Validação de Dados** - Pydantic para validação de entrada
+- ✅ **Documentação Swagger** - API documentada automaticamente
+- ✅ **Testes Automatizados** - 12 testes com pytest
+
+**Frontend (Interface Web):**
+- ✅ **Dashboard Interativo** - Visualização de tarefas em tempo real
+- ✅ **Sistema de Login/Registro** - Interface de autenticação
+- ✅ **Cards de Estatísticas** - Total, pendentes e concluídas
+- ✅ **Filtros de Tarefas** - Por status (todas/pendentes/concluídas)
+- ✅ **Design Responsivo** - Bootstrap 5 com gradientes modernos
+
+**DevOps:**
+- ✅ **Docker** - Containerização completa (API + PostgreSQL)
+- ✅ **CI/CD** - GitHub Actions com testes automatizados
+- ✅ **Scripts de Automação** - Start, stop, test e reset
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
-- **Python 3.9+** - Linguagem principal
-- **Flask** - Framework web minimalista e poderoso
-- **Flask-RESTx** - Extensão para APIs REST com Swagger
-- **SQLAlchemy** - ORM para interação com banco de dados
-- **PostgreSQL** - Banco de dados relacional (produção)
-- **SQLite** - Banco de dados para testes
+- **Python 3.9+** | **Flask 2.3+** | **Flask-RESTx** (API REST + Swagger)
+- **SQLAlchemy** (ORM) | **PostgreSQL** (Produção) | **SQLite** (Testes)
+- **Flask-JWT-Extended** (Autenticação) | **Bcrypt** (Hash de senhas)
+- **Pydantic** (Validação de dados)
 
-### Segurança & Validação
-- **Flask-JWT-Extended** - Autenticação e autorização JWT
-- **Flask-Bcrypt** - Hash seguro de senhas
-- **Pydantic** - Validação de schemas e tipos
+### Frontend
+- **HTML5** | **CSS3** | **JavaScript ES6+**
+- **Bootstrap 5** (Framework CSS responsivo)
+- **Bootstrap Icons** (Ícones)
+- **Fetch API** (Comunicação com backend)
 
-### DevOps & Infraestrutura
-- **Docker** - Containerização da aplicação
-- **Docker Compose** - Orquestração de containers
-- **GitHub Actions** - CI/CD automatizado
-- **pytest** - Framework de testes
+### DevOps
+- **Docker** + **Docker Compose** (Containerização)
+- **GitHub Actions** (CI/CD)
+- **pytest** (Testes automatizados)
+- **Alembic** (Migrações de banco)
 
 ---
 
@@ -67,11 +76,16 @@ cd projeto-api-devops
 # 2. Crie o arquivo .env (use o .env.example como base)
 cp .env.example .env
 
-# 3. Suba a aplicação
+# 3. Suba o backend (API + Banco)
 docker-compose up --build
 
-# 4. Acesse a documentação Swagger
-# http://localhost:5000/docs
+# 4. Em outro terminal, suba o frontend
+cd frontend
+python3 -m http.server 8080
+
+# 5. Acesse a aplicação:
+# Frontend: http://localhost:8080
+# API Docs: http://localhost:5000/docs
 ```
 
 ### Opção 2: Desenvolvimento Local
@@ -170,35 +184,34 @@ pytest tests/test_api.py -v
 
 ---
 
-## 🏗️ Arquitetura
+## 🏗️ Estrutura do Projeto
 
 ```
 projeto-api-devops/
-├── app.py                 # Aplicação principal e rotas
-├── config.py              # Configurações (dev, test, prod)
-├── schemas.py             # Validação com Pydantic
-├── run.py                 # Entry point da aplicação
+├── frontend/              # Interface web
+│   ├── index.html         # Página principal
+│   ├── app.js             # Lógica JavaScript
+│   └── style.css          # Estilos customizados
+├── app.py                 # Backend - API REST
+├── config.py              # Configurações de ambiente
+├── schemas.py             # Validação de dados
 ├── requirements.txt       # Dependências Python
-├── Dockerfile             # Imagem Docker
-├── docker-compose.yml     # Orquestração de containers
-├── migrations/            # Migrações do banco de dados
-│   └── versions/          # Histórico de migrações
-├── tests/                 # Suite de testes
-│   ├── conftest.py        # Configuração dos testes
-│   └── test_api.py        # Testes da API
-└── .github/
-    └── workflows/
-        └── main.yml       # Pipeline CI/CD
+├── Dockerfile             # Container da aplicação
+├── docker-compose.yml     # Orquestração (API + DB)
+├── tests/                 # Testes automatizados
+│   └── test_api.py        # 12 testes com pytest
+└── .github/workflows/     # CI/CD Pipeline
+    └── main.yml
 ```
 
-### Fluxo de Dados
+### Fluxo de Funcionamento
 
 ```
-Cliente → API (Flask) → Validação (Pydantic) → ORM (SQLAlchemy) → PostgreSQL
-           ↓
-    Autenticação JWT
-           ↓
-    Documentação Swagger
+Frontend (Browser)
+    ↓ HTTP/JSON
+Backend (Flask API)
+    ↓ JWT + Validação
+Banco de Dados (PostgreSQL)
 ```
 
 ---
@@ -213,33 +226,25 @@ Cliente → API (Flask) → Validação (Pydantic) → ORM (SQLAlchemy) → Post
 
 ---
 
-## 🚀 CI/CD
+## 🚀 CI/CD Pipeline
 
-O projeto utiliza **GitHub Actions** para:
+**GitHub Actions** executa automaticamente a cada push:
 
-1. ✅ **Testes Automatizados** - Executa pytest a cada push
-2. ✅ **Build Docker** - Constrói imagem Docker
-3. ✅ **Push para Docker Hub** - Publica imagem automaticamente
-4. ⏳ **Deploy Automático** - (Em implementação)
-
-### Pipeline
-
-```yaml
-Push → GitHub → Testes → Build → Docker Hub → Deploy
 ```
+git push → GitHub Actions → Testes (pytest) → Build Docker → Deploy
+```
+
+✅ Se os testes passarem → Build da imagem Docker  
+❌ Se os testes falharem → Pipeline interrompido
 
 ---
 
-## 📈 Melhorias Futuras
+## 📈 Próximos Passos
 
-- [ ] Implementar relacionamento User ↔ Tarefas (cada usuário vê apenas suas tarefas)
-- [ ] Adicionar paginação nas listagens
-- [ ] Implementar filtros e busca
-- [ ] Adicionar rate limiting
-- [ ] Logs estruturados (JSON)
-- [ ] Métricas e monitoramento
-- [ ] Deploy na Azure
-- [ ] Frontend em TypeScript/React
+- [ ] **Deploy na Azure** - Utilizando Azure App Service com CI/CD
+- [ ] **Kubernetes** - Orquestração de containers em produção
+- [ ] **Monitoramento** - Grafana + Prometheus para métricas
+- [ ] **Frontend Aprimorado** - Melhorias na UI/UX com animações
 
 ---
 
