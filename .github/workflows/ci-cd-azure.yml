@@ -199,12 +199,37 @@ jobs:
           exit 1
         fi
         
+    - name: '🌐 Configure Custom Domain (Optional)'
+      run: |
+        if [ "${{ secrets.CUSTOM_DOMAIN }}" != "" ]; then
+          echo "� Configurando domínio personalizado: ${{ secrets.CUSTOM_DOMAIN }}"
+          
+          # Adiciona hostname se não existir
+          az containerapp hostname add \
+            --name ${{ env.AZURE_CONTAINER_APP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --hostname ${{ secrets.CUSTOM_DOMAIN }} 2>/dev/null || echo "Hostname já existe"
+            
+          # Bind certificado SSL
+          az containerapp hostname bind \
+            --name ${{ env.AZURE_CONTAINER_APP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --hostname ${{ secrets.CUSTOM_DOMAIN }} \
+            --environment ${{ env.AZURE_CONTAINER_ENV }} 2>/dev/null || echo "SSL já configurado"
+            
+          echo "✅ Domínio configurado: https://${{ secrets.CUSTOM_DOMAIN }}"
+          echo "CUSTOM_URL=https://${{ secrets.CUSTOM_DOMAIN }}" >> $GITHUB_ENV
+        else
+          echo "⚠️  CUSTOM_DOMAIN secret não configurado - usando URL padrão"
+          echo "CUSTOM_URL=https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io" >> $GITHUB_ENV
+        fi
+        
     - name: '📊 Informações do Deploy'
       run: |
         echo "🎉 DEPLOY CONCLUÍDO COM SUCESSO!"
         echo ""
-        echo "🔗 URL da Aplicação: https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io"
-        echo "📚 Documentação: https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io/docs"
+        echo "🔗 URL da Aplicação: ${{ env.CUSTOM_URL }}"
+        echo "📚 Documentação: ${{ env.CUSTOM_URL }}/docs"
         echo "🐳 Imagem: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
         echo "📝 Commit: ${{ github.sha }}"
         echo "👤 Autor: ${{ github.actor }}"

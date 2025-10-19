@@ -256,12 +256,31 @@ Banco de Dados (PostgreSQL)
 
 ---
 
+## 🌐 **Domínio Personalizado**
+
+Quer usar seu próprio domínio? É simples!
+
+### **🚀 Configuração Automática:**
+```bash
+# Execute o script de configuração
+./scripts/setup-custom-domain.sh meuapp.com.br
+```
+
+### **⚙️ Configuração Manual:**
+1. Configure DNS: `CNAME api.meuapp.com.br → projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io`
+2. Adicione secret `CUSTOM_DOMAIN` no GitHub  
+3. Próximo deploy configurará SSL automaticamente!
+
+📖 **[Guia Completo de Domínio Personalizado](docs/DOMINIO-PERSONALIZADO.md)**
+
+---
+
 ## 📈 Próximos Passos
 
-- [ ] **Deploy na Azure** - Utilizando Azure App Service com CI/CD
-- [ ] **Kubernetes** - Orquestração de containers em produção
-- [ ] **Monitoramento** - Grafana + Prometheus para métricas
-- [ ] **Frontend Aprimorado** - Melhorias na UI/UX com animações
+- [x] **Deploy na Azure** - ✅ Funcionando com Azure Container Apps
+- [ ] **PostgreSQL** - Banco de dados gerenciado na nuvem  
+- [ ] **Monitoramento** - Application Insights + métricas
+- [ ] **CDN** - Azure CDN para frontend estático
 
 ---
 
