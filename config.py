@@ -26,21 +26,22 @@ class ProductionConfig(Config):
     """Configurações para ambiente de produção (Azure)."""
     DEBUG = False
     
-    # Configuração PostgreSQL para produção no Azure
+    # Configuração PostgreSQL para produção no Azure Container Apps
     database_url = os.getenv('DATABASE_URL')
     
     if database_url:
-        # Azure fornece DATABASE_URL diretamente (PostgreSQL gerenciado)
+        # Azure fornece DATABASE_URL diretamente
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        # Constrói URL do PostgreSQL Azure manualmente
-        db_server = os.getenv('POSTGRES_SERVER', 'projeto-postgres-server.postgres.database.azure.com')
-        db_user = os.getenv('POSTGRES_USER', 'pgadmin')
-        db_password = os.getenv('POSTGRES_PASSWORD', 'MinhaSenh@123!')
-        db_name = os.getenv('POSTGRES_DB', 'postgres')
+        # Container Apps PostgreSQL interno
+        db_server = os.getenv('POSTGRES_SERVER', 'postgres-app.internal.gentleisland-7ad00bd6.eastus.azurecontainerapps.io')
+        db_user = os.getenv('POSTGRES_USER', 'pgladmin')
+        db_password = os.getenv('POSTGRES_PASSWORD', 'MinhaSenh123')
+        db_name = os.getenv('POSTGRES_DB', 'apitodo')
         db_port = os.getenv('POSTGRES_PORT', '5432')
         
-        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?sslmode=require"
+        # Container Apps internal não usa SSL por padrão
+        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}"
 
 # Mapeia nomes de ambiente para classes de configuração
 config_by_name = {
