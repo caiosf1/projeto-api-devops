@@ -58,7 +58,20 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 
 ---
 
-## 🚀 Como Rodar o Projeto
+## 🚀 Como Usar
+
+### 🌐 Versão em Produção (Pronto para Usar!)
+
+**A aplicação já está no ar! Acesse agora:**
+
+🎨 **Frontend**: [https://app.caiodev.me](https://app.caiodev.me)  
+🔌 **API**: [https://api.caiodev.me/docs](https://api.caiodev.me/docs)
+
+Crie sua conta e comece a usar imediatamente!
+
+---
+
+### 💻 Rodar Localmente (Desenvolvimento)
 
 ### Pré-requisitos
 
@@ -119,8 +132,11 @@ python run.py
 
 ## 📚 Documentação da API
 
-### Swagger UI
-Acesse `http://localhost:5000/docs` para a documentação interativa completa.
+### 🌐 Aplicação em Produção
+
+**Frontend:** [https://app.caiodev.me](https://app.caiodev.me)  
+**API Backend:** [https://api.caiodev.me](https://api.caiodev.me)  
+**Swagger Docs:** [https://api.caiodev.me/docs](https://api.caiodev.me/docs)
 
 ### Endpoints Principais
 
@@ -141,29 +157,29 @@ Acesse `http://localhost:5000/docs` para a documentação interativa completa.
 | PUT | `/tarefas/{id}` | Atualizar tarefa | JWT |
 | DELETE | `/tarefas/{id}` | Deletar tarefa | JWT |
 
-### Exemplo de Uso
+### Exemplo de Uso (Produção)
 
 ```bash
 # 1. Registrar usuário
-curl -X POST http://localhost:5000/auth/register \
+curl -X POST https://api.caiodev.me/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "senha": "senha123"}'
+  -d '{"email": "user@example.com", "senha": "SenhaForte123!"}'
 
 # 2. Fazer login
-curl -X POST http://localhost:5000/auth/login \
+curl -X POST https://api.caiodev.me/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "senha": "senha123"}'
+  -d '{"email": "user@example.com", "senha": "SenhaForte123!"}'
 
 # Resposta: {"access_token": "eyJ0eXAiOiJKV1QiLCJh..."}
 
 # 3. Criar tarefa (usar o token obtido)
-curl -X POST http://localhost:5000/tarefas \
+curl -X POST https://api.caiodev.me/tarefas \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJh..." \
   -d '{"descricao": "Estudar Flask", "prioridade": "alta"}'
 
 # 4. Listar tarefas
-curl -X GET http://localhost:5000/tarefas \
+curl -X GET https://api.caiodev.me/tarefas \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJh..."
 ```
 
