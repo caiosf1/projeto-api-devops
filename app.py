@@ -389,14 +389,33 @@ def create_app(config_class='config.DevelopmentConfig'):
     # Cria automaticamente as tabelas quando app inicia
     # Essential para PostgreSQL em Container Apps!
     with app.app_context():
-        try:
-            print("🔄 Tentando conectar no banco de dados...")
-            db.create_all()
-            print("✅ Tabelas criadas com sucesso!")
-        except Exception as e:
-            print(f"❌ Erro ao criar tabelas: {e}")
-            print("⚠️  App vai iniciar mesmo assim - tabelas serão criadas na primeira requisição")
-            # Não falha a aplicação, só loga o erro
+        max_retries = 5
+        retry_delay = 10  # segundos
+        
+        for attempt in range(1, max_retries + 1):
+            try:
+                print(f"🔄 Tentativa {attempt}/{max_retries}: Conectando no banco de dados...")
+                
+                # Testa conexão primeiro
+                db.engine.execute('SELECT 1')
+                print("✅ Conexão com banco estabelecida!")
+                
+                # Cria tabelas
+                db.create_all()
+                print("✅ Tabelas criadas com sucesso!")
+                break
+                
+            except Exception as e:
+                print(f"❌ Tentativa {attempt} falhou: {e}")
+                
+                if attempt < max_retries:
+                    print(f"⏳ Aguardando {retry_delay}s antes da próxima tentativa...")
+                    import time
+                    time.sleep(retry_delay)
+                    retry_delay += 5  # Backoff progressivo
+                else:
+                    print("⚠️  Todas as tentativas falharam. App vai iniciar mesmo assim.")
+                    print("💡 Tabelas serão criadas na primeira requisição bem-sucedida.")
     
     return app
 
@@ -417,10 +436,48 @@ def health_check_db():
     try:
         # Testa conexão com banco
         with app.app_context():
-            db.engine.execute('SELECT 1')
-        return {'status': 'healthy', 'database': 'connected'}, 200
+            result = db.engine.execute('SELECT 1').fetchone()
+            if result:
+                return {'status': 'healthy', 'database': 'connected'}, 200
+            else:
+                return {'status': 'unhealthy', 'database': 'no_result'}, 503
     except Exception as e:
         return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)}, 503
+
+@app.route('/health/full')
+def health_check_full():
+    """Endpoint completo de verificação com informações detalhadas"""
+    import os
+    health_info = {
+        'status': 'healthy',
+        'timestamp': __import__('datetime').datetime.utcnow().isoformat(),
+        'environment': os.getenv('FLASK_ENV', 'unknown'),
+        'database': 'unknown'
+    }
+    
+    try:
+        # Testa banco
+        with app.app_context():
+            result = db.engine.execute('SELECT 1').fetchone()
+            if result:
+                health_info['database'] = 'connected'
+                
+                # Testa se tabelas existem
+                from sqlalchemy import inspect
+                inspector = inspect(db.engine)
+                tables = inspector.get_table_names()
+                health_info['tables_count'] = len(tables)
+                health_info['tables'] = tables
+            else:
+                health_info['database'] = 'no_result'
+                health_info['status'] = 'unhealthy'
+                
+    except Exception as e:
+        health_info['database'] = f'error: {str(e)}'
+        health_info['status'] = 'unhealthy'
+    
+    status_code = 200 if health_info['status'] == 'healthy' else 503
+    return health_info, status_code
 
 @app.route('/')
 def index():
