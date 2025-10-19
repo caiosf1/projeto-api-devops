@@ -385,4 +385,16 @@ def create_app(config_class='config.DevelopmentConfig'):
             db.session.commit()
             return '', 204
 
+    # 🗃️ INICIALIZAÇÃO DAS TABELAS NO BANCO
+    # Cria automaticamente as tabelas quando app inicia
+    # Essential para PostgreSQL em Container Apps!
+    @app.before_first_request
+    def inicializar_banco():
+        """Cria tabelas no primeiro request da aplicação."""
+        try:
+            db.create_all()
+            print("✅ Tabelas criadas com sucesso!")
+        except Exception as e:
+            print(f"❌ Erro ao criar tabelas: {e}")
+    
     return app
