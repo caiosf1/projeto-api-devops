@@ -12,5 +12,9 @@ COPY migrations/ ./migrations/
 # 3. Copia o resto do código da aplicação
 COPY . .
 
+# 4. Definir variáveis de ambiente padrão
+ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
+
 EXPOSE 5000
 CMD ["python3", "run.py"]
