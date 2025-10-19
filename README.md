@@ -303,7 +303,48 @@ Quer usar seu próprio domínio? É simples!
 
 📖 **[Guia Completo de Domínio Personalizado](docs/DOMINIO-PERSONALIZADO.md)**
 
-**🎯 Sugestão:** Use `caiodev.me` - perfeito para portfolio de desenvolvedor!
+---
+
+## � Deploy em Produção
+
+### 🚀 Aplicação no Ar
+
+**Frontend:** [https://app.caiodev.me](https://app.caiodev.me)  
+**API Backend:** [https://api.caiodev.me](https://api.caiodev.me)  
+**Documentação:** [https://api.caiodev.me/docs](https://api.caiodev.me/docs)
+
+### ✅ Infraestrutura Azure
+
+**Backend (Azure Container Apps):**
+- Container Apps com auto-scaling
+- Domínio personalizado com SSL automático
+- 0.5 CPU / 1Gi RAM (Consumption tier)
+- CI/CD via GitHub Actions
+
+**Frontend (Azure Static Web Apps):**
+- Hospedagem estática (Free tier)
+- Domínio personalizado configurado
+- Deploy automático via GitHub Actions
+- CDN global integrado
+
+**Banco de Dados (Azure Database for PostgreSQL):**
+- PostgreSQL 14 Flexible Server
+- Standard_B1ms (1 vCore, 2GB RAM)
+- 32GB storage com backup automático
+- SSL/TLS obrigatório
+
+**Registry:** Docker Hub `caiosfdev/projeto-api-devops:latest`
+
+### 🔒 Segurança em Produção
+
+- ✅ Todas as credenciais via GitHub Secrets
+- ✅ SSL/TLS automático (Let's Encrypt)
+- ✅ Senhas hasheadas com Bcrypt
+- ✅ Autenticação JWT stateless
+- ✅ PostgreSQL com SSL obrigatório
+- ✅ Variáveis de ambiente protegidas
+
+---
 
 ---
 
