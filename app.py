@@ -232,6 +232,76 @@ def create_app(config_class='config.DevelopmentConfig'):
         }
     }
 
+    # ==================
+    # 6. ROTAS DE HEALTH (antes do Swagger para não serem interceptadas)
+    # ==================
+    @app.route('/health')
+    def health_check():
+        """Endpoint de verificação de saúde da aplicação - não depende do banco"""
+        return {'status': 'healthy', 'message': 'API está funcionando'}, 200
+
+    @app.route('/health/db')  
+    def health_check_db():
+        """Endpoint de verificação de saúde com teste de banco"""
+        try:
+            # Testa conexão com banco com timeout curto (SQLAlchemy 2.0 syntax)
+            with app.app_context():
+                from sqlalchemy import text
+                with db.engine.connect() as connection:
+                    result = connection.execute(text('SELECT 1')).fetchone()
+                    if result:
+                        # Tenta criar tabelas se não existirem (lazy initialization)
+                        try:
+                            db.create_all()
+                            return {'status': 'healthy', 'database': 'connected', 'tables': 'ready'}, 200
+                        except Exception as table_error:
+                            return {'status': 'healthy', 'database': 'connected', 'tables': 'error', 'table_error': str(table_error)}, 200
+                    else:
+                        return {'status': 'unhealthy', 'database': 'no_result'}, 503
+        except Exception as e:
+            return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)[:200]}, 503
+
+    @app.route('/health/full')
+    def health_check_full():
+        """Endpoint completo de verificação com informações detalhadas"""
+        import os
+        health_info = {
+            'status': 'healthy',
+            'timestamp': __import__('datetime').datetime.utcnow().isoformat(),
+            'environment': os.getenv('FLASK_ENV', 'unknown'),
+            'database': 'unknown'
+        }
+        
+        try:
+            # Testa banco (SQLAlchemy 2.0 syntax)
+            with app.app_context():
+                from sqlalchemy import text
+                with db.engine.connect() as connection:
+                    result = connection.execute(text('SELECT 1')).fetchone()
+                    if result:
+                        health_info['database'] = 'connected'
+                        
+                        # Testa se tabelas existem
+                        from sqlalchemy import inspect
+                        inspector = inspect(db.engine)
+                        tables = inspector.get_table_names()
+                        health_info['tables_count'] = len(tables)
+                        health_info['tables'] = tables
+                    else:
+                        health_info['database'] = 'no_result'
+                        health_info['status'] = 'unhealthy'
+                    
+        except Exception as e:
+            health_info['database'] = f'error: {str(e)}'
+            health_info['status'] = 'unhealthy'
+        
+        status_code = 200 if health_info['status'] == 'healthy' else 503
+        return health_info, status_code
+
+    @app.route('/')
+    def index():
+        return {'message': 'API funcionando', 'docs': '/docs'}, 200
+
     # API principal - Configuração do Swagger
     api = Api(
         app,
@@ -442,73 +512,6 @@ def create_app(config_class='config.DevelopmentConfig'):
 # ===================================================================================
 # Cria instância padrão da aplicação para uso fora do factory pattern
 app = create_app()
-
-@app.route('/health')
-def health_check():
-    """Endpoint de verificação de saúde da aplicação - não depende do banco"""
-    return {'status': 'healthy', 'message': 'API está funcionando'}, 200
-
-@app.route('/health/db')  
-def health_check_db():
-    """Endpoint de verificação de saúde com teste de banco"""
-    try:
-        # Testa conexão com banco com timeout curto (SQLAlchemy 2.0 syntax)
-        with app.app_context():
-            from sqlalchemy import text
-            with db.engine.connect() as connection:
-                result = connection.execute(text('SELECT 1')).fetchone()
-                if result:
-                    # Tenta criar tabelas se não existirem (lazy initialization)
-                    try:
-                        db.create_all()
-                        return {'status': 'healthy', 'database': 'connected', 'tables': 'ready'}, 200
-                    except Exception as table_error:
-                        return {'status': 'healthy', 'database': 'connected', 'tables': 'error', 'table_error': str(table_error)}, 200
-                else:
-                    return {'status': 'unhealthy', 'database': 'no_result'}, 503
-    except Exception as e:
-        return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)[:200]}, 503
-
-@app.route('/health/full')
-def health_check_full():
-    """Endpoint completo de verificação com informações detalhadas"""
-    import os
-    health_info = {
-        'status': 'healthy',
-        'timestamp': __import__('datetime').datetime.utcnow().isoformat(),
-        'environment': os.getenv('FLASK_ENV', 'unknown'),
-        'database': 'unknown'
-    }
-    
-    try:
-        # Testa banco (SQLAlchemy 2.0 syntax)
-        with app.app_context():
-            from sqlalchemy import text
-            with db.engine.connect() as connection:
-                result = connection.execute(text('SELECT 1')).fetchone()
-                if result:
-                    health_info['database'] = 'connected'
-                    
-                    # Testa se tabelas existem
-                    from sqlalchemy import inspect
-                    inspector = inspect(db.engine)
-                    tables = inspector.get_table_names()
-                    health_info['tables_count'] = len(tables)
-                    health_info['tables'] = tables
-                else:
-                    health_info['database'] = 'no_result'
-                    health_info['status'] = 'unhealthy'
-                
-    except Exception as e:
-        health_info['database'] = f'error: {str(e)}'
-        health_info['status'] = 'unhealthy'
-    
-    status_code = 200 if health_info['status'] == 'healthy' else 503
-    return health_info, status_code
-
-@app.route('/')
-def index():
-    return {'message': 'API funcionando', 'docs': '/docs'}, 200
 
 if __name__ == '__main__':
     app.run(debug=True)
