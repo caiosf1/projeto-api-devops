@@ -173,7 +173,7 @@ jobs:
     - name: '⏳ Aguardar Deploy Completar'
       run: |
         echo "⏳ Aguardando deploy finalizar..."
-        sleep 30
+        sleep 60  # Aguarda mais tempo para inicialização
         
         # Verificar se nova revisão está ativa
         REVISION=$(az containerapp revision list \
@@ -189,8 +189,24 @@ jobs:
         
         APP_URL="https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io"
         
-        # Teste básico de conectividade
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL/docs" || echo "000")
+        # Retry com timeout maior
+        for i in {1..5}; do
+          echo "🔄 Tentativa $i/5..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$APP_URL/health" || echo "000")
+          
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ API está funcionando! (Status: $HTTP_STATUS)"
+            exit 0
+          else
+            echo "⏳ API ainda não responde (Status: $HTTP_STATUS). Aguardando..."
+            sleep 30
+          fi
+        done
+        
+        echo "❌ API não está respondendo após 5 tentativas (Status: $HTTP_STATUS)"
+        echo "🔍 Verificando logs do container..."
+        az containerapp logs show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 20 || echo "Não foi possível obter logs"
+        exit 1
         
         if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "404" ]; then
           echo "✅ API está respondendo (Status: $HTTP_STATUS)"

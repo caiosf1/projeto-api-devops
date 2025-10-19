@@ -397,3 +397,21 @@ def create_app(config_class='config.DevelopmentConfig'):
             # Não falha a aplicação, só loga o erro
     
     return app
+
+# ===================================================================================
+# 🌍 INSTANCIAR APP PARA USO DIRETO
+# ===================================================================================
+# Cria instância padrão da aplicação para uso fora do factory pattern
+app = create_app()
+
+@app.route('/health')
+def health_check():
+    """Endpoint de verificação de saúde da aplicação"""
+    return {'status': 'healthy', 'message': 'API está funcionando'}, 200
+
+@app.route('/')
+def index():
+    return {'message': 'API funcionando', 'docs': '/docs'}, 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
