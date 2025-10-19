@@ -1,43 +1,57 @@
 import os
 from dotenv import load_dotenv
 
+# Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
 class Config:
-    """Configurações base."""
+    """Configurações base da aplicação."""
     SECRET_KEY = os.getenv('SECRET_KEY', 'uma-chave-secreta-bem-segura')
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'outra-chave-secreta-para-jwt')
-import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
-from flask_migrate import Migrate
-
-
-app = Flask(__name__)
-
-# Constrói a URI do banco de dados a partir das variáveis de ambiente
-db_user = os.getenv('POSTGRES_USER', 'caio')
-db_password = os.getenv('POSTGRES_PASSWORD', 'minhasenha')
-db_name = os.getenv('POSTGRES_DB', 'apitodo')
-db_host = 'db'  # Nome do serviço do postgres no docker-compose
-
-# String de conexão completa
-database_uri = f"postgresql://{db_user}:{db_password}@{db_host}/{db_name}"
-
-app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-migrate = Migrate(app, db)
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
-    """Configurações de desenvolvimento."""
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///dev.db')
+    """Configurações para ambiente de desenvolvimento."""
     DEBUG = True
+    # SQLite para desenvolvimento local
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///dev.db')
 
 class TestingConfig(Config):
-    """Configurações de teste."""
+    """Configurações para ambiente de testes."""
+    TESTING = True
+    # SQLite em memória para testes (mais rápido)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+
+class ProductionConfig(Config):
+    """Configurações para ambiente de produção (Azure)."""
+    DEBUG = False
+    
+    # Tenta pegar DATABASE_URL primeiro (Azure), senão constrói do PostgreSQL
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # Azure fornece DATABASE_URL diretamente
+        SQLALCHEMY_DATABASE_URI = database_url
+    else:
+        # Constrói URL do PostgreSQL manualmente
+        db_user = os.getenv('POSTGRES_USER', 'caio')
+        db_password = os.getenv('POSTGRES_PASSWORD', 'minhasenha')
+        db_name = os.getenv('POSTGRES_DB', 'apitodo')
+        db_host = os.getenv('POSTGRES_HOST', 'db')
+        db_port = os.getenv('POSTGRES_PORT', '5432')
+        
+        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+
+# Mapeia nomes de ambiente para classes de configuração
+config_by_name = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'production': ProductionConfig
+}
+
+def get_config():
+    """Retorna configuração baseada na variável FLASK_ENV."""
+    env = os.getenv('FLASK_ENV', 'development')
+    return config_by_name.get(env, DevelopmentConfig)
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:' # Usa um banco de dados em memória para testes
