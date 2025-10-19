@@ -229,11 +229,16 @@ jobs:
         echo "🎉 DEPLOY CONCLUÍDO COM SUCESSO!"
         echo ""
         echo "🔗 URL da Aplicação: ${{ env.CUSTOM_URL }}"
-        echo "📚 Documentação: ${{ env.CUSTOM_URL }}/docs"
+        echo "📚 Documentação: ${{ env.CUSTOM_URL }}/docs"  
         echo "🐳 Imagem: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
         echo "📝 Commit: ${{ github.sha }}"
         echo "👤 Autor: ${{ github.actor }}"
         echo "🌿 Branch: ${{ github.ref_name }}"
+        echo ""
+        echo "💡 Para configurar domínio personalizado:"
+        echo "   1. Registre seu domínio (ex: caiodev.me)"
+        echo "   2. Execute: ./scripts/setup-custom-domain.sh caiodev.me"
+        echo "   3. Configure DNS conforme instruções"
 
   # ==================
   # 📊 JOB 4: NOTIFICAÇÕES

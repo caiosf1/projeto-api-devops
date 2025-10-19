@@ -273,6 +273,8 @@ Quer usar seu próprio domínio? É simples!
 
 📖 **[Guia Completo de Domínio Personalizado](docs/DOMINIO-PERSONALIZADO.md)**
 
+**🎯 Sugestão:** Use `caiodev.me` - perfeito para portfolio de desenvolvedor!
+
 ---
 
 ## 📈 Próximos Passos
