@@ -15,6 +15,13 @@ env:
   AZURE_CONTAINER_APP: projeto-api-caio
   AZURE_CONTAINER_ENV: env-projeto-api
 
+# Permissões necessárias para o pipeline
+permissions:
+  contents: read
+  security-events: write  # Para upload SARIF
+  actions: read
+  id-token: write        # Para Azure OIDC (futuro)
+
 # ===================================================================================
 # 🔧 JOBS DO PIPELINE
 # ===================================================================================
@@ -115,10 +122,11 @@ jobs:
       continue-on-error: true  # Não falha o build por vulnerabilidades
       
     - name: '📤 Upload Scan Results'
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
       if: always()
+      continue-on-error: true  # Não falha se upload não funcionar
 
   # ==================
   # 🌐 JOB 3: DEPLOY AZURE
@@ -131,7 +139,7 @@ jobs:
     # Só deploy em push para main
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
-    environment: production  # GitHub Environment (opcional, para aprovações manuais)
+    # environment: production  # Desabilitado - pode ser habilitado se criar environment no GitHub
     
     steps:
     - name: '📥 Checkout do Código'
@@ -228,8 +236,8 @@ jobs:
       run: |
         echo "🎉 DEPLOY CONCLUÍDO COM SUCESSO!"
         echo ""
-        echo "🔗 URL da Aplicação: ${{ env.CUSTOM_URL }}"
-        echo "📚 Documentação: ${{ env.CUSTOM_URL }}/docs"  
+        echo "🔗 URL da Aplicação: ${CUSTOM_URL:-https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io}"
+        echo "📚 Documentação: ${CUSTOM_URL:-https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io}/docs"  
         echo "🐳 Imagem: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
         echo "📝 Commit: ${{ github.sha }}"
         echo "👤 Autor: ${{ github.actor }}"
