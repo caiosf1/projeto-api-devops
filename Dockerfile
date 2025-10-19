@@ -11,21 +11,17 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install -r requirements.txt psycopg2-binary
 
-# 3. Copia o script de espera pelo PostgreSQL
-COPY wait-for-postgres.py .
-
-# 4. Copia a pasta de migrações
+# 3. Copia a pasta de migrações
 COPY migrations/ ./migrations/
 
-# 5. Copia o resto do código da aplicação
+# 4. Copia o resto do código da aplicação
 COPY . .
 
-# 6. Definir variáveis de ambiente padrão
+# 5. Definir variáveis de ambiente padrão
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
 
 EXPOSE 5000
 
-# 7. Script de entrada que aguarda PostgreSQL e depois inicia a app
-# Se wait-for-postgres falhar, ainda assim inicia a app (modo degradado)
-CMD ["sh", "-c", "python3 wait-for-postgres.py || echo '⚠️ Iniciando em modo degradado' && python3 run.py"]
+# 6. Inicia a aplicação
+CMD ["python3", "run.py"]
