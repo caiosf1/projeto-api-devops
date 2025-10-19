@@ -399,10 +399,12 @@ def create_app(config_class='config.DevelopmentConfig'):
                 try:
                     print(f"🔄 Tentativa {attempt}/{max_retries}: Conectando no banco de dados...")
                     
-                    # Testa conexão primeiro
-                    result = db.engine.execute('SELECT 1').fetchone()
-                    if not result:
-                        raise Exception("Consulta retornou resultado vazio")
+                    # Testa conexão primeiro (SQLAlchemy 2.0 syntax)
+                    from sqlalchemy import text
+                    with db.engine.connect() as connection:
+                        result = connection.execute(text('SELECT 1')).fetchone()
+                        if not result:
+                            raise Exception("Consulta retornou resultado vazio")
                         
                     print("✅ Conexão com banco estabelecida!")
                     
@@ -450,20 +452,20 @@ def health_check():
 def health_check_db():
     """Endpoint de verificação de saúde com teste de banco"""
     try:
-        # Testa conexão com banco com timeout curto
+        # Testa conexão com banco com timeout curto (SQLAlchemy 2.0 syntax)
         with app.app_context():
-            # Configuração de timeout para health check
             from sqlalchemy import text
-            result = db.engine.execute(text('SELECT 1')).fetchone()
-            if result:
-                # Tenta criar tabelas se não existirem (lazy initialization)
-                try:
-                    db.create_all()
-                    return {'status': 'healthy', 'database': 'connected', 'tables': 'ready'}, 200
-                except Exception as table_error:
-                    return {'status': 'healthy', 'database': 'connected', 'tables': 'error', 'table_error': str(table_error)}, 200
-            else:
-                return {'status': 'unhealthy', 'database': 'no_result'}, 503
+            with db.engine.connect() as connection:
+                result = connection.execute(text('SELECT 1')).fetchone()
+                if result:
+                    # Tenta criar tabelas se não existirem (lazy initialization)
+                    try:
+                        db.create_all()
+                        return {'status': 'healthy', 'database': 'connected', 'tables': 'ready'}, 200
+                    except Exception as table_error:
+                        return {'status': 'healthy', 'database': 'connected', 'tables': 'error', 'table_error': str(table_error)}, 200
+                else:
+                    return {'status': 'unhealthy', 'database': 'no_result'}, 503
     except Exception as e:
         return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)[:200]}, 503
 
@@ -479,21 +481,23 @@ def health_check_full():
     }
     
     try:
-        # Testa banco
+        # Testa banco (SQLAlchemy 2.0 syntax)
         with app.app_context():
-            result = db.engine.execute('SELECT 1').fetchone()
-            if result:
-                health_info['database'] = 'connected'
-                
-                # Testa se tabelas existem
-                from sqlalchemy import inspect
-                inspector = inspect(db.engine)
-                tables = inspector.get_table_names()
-                health_info['tables_count'] = len(tables)
-                health_info['tables'] = tables
-            else:
-                health_info['database'] = 'no_result'
-                health_info['status'] = 'unhealthy'
+            from sqlalchemy import text
+            with db.engine.connect() as connection:
+                result = connection.execute(text('SELECT 1')).fetchone()
+                if result:
+                    health_info['database'] = 'connected'
+                    
+                    # Testa se tabelas existem
+                    from sqlalchemy import inspect
+                    inspector = inspect(db.engine)
+                    tables = inspector.get_table_names()
+                    health_info['tables_count'] = len(tables)
+                    health_info['tables'] = tables
+                else:
+                    health_info['database'] = 'no_result'
+                    health_info['status'] = 'unhealthy'
                 
     except Exception as e:
         health_info['database'] = f'error: {str(e)}'
