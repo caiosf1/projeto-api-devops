@@ -390,10 +390,12 @@ def create_app(config_class='config.DevelopmentConfig'):
     # Essential para PostgreSQL em Container Apps!
     with app.app_context():
         try:
+            print("🔄 Tentando conectar no banco de dados...")
             db.create_all()
             print("✅ Tabelas criadas com sucesso!")
         except Exception as e:
             print(f"❌ Erro ao criar tabelas: {e}")
+            print("⚠️  App vai iniciar mesmo assim - tabelas serão criadas na primeira requisição")
             # Não falha a aplicação, só loga o erro
     
     return app
@@ -406,8 +408,19 @@ app = create_app()
 
 @app.route('/health')
 def health_check():
-    """Endpoint de verificação de saúde da aplicação"""
+    """Endpoint de verificação de saúde da aplicação - não depende do banco"""
     return {'status': 'healthy', 'message': 'API está funcionando'}, 200
+
+@app.route('/health/db')  
+def health_check_db():
+    """Endpoint de verificação de saúde com teste de banco"""
+    try:
+        # Testa conexão com banco
+        with app.app_context():
+            db.engine.execute('SELECT 1')
+        return {'status': 'healthy', 'database': 'connected'}, 200
+    except Exception as e:
+        return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)}, 503
 
 @app.route('/')
 def index():

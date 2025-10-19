@@ -44,8 +44,8 @@ class ProductionConfig(Config):
         if not db_password:
             raise ValueError("❌ POSTGRES_PASSWORD deve ser definida via variável de ambiente!")
         
-        # Container Apps internal não usa SSL por padrão
-        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}"
+        # Container Apps internal não usa SSL por padrão + timeout aumentado
+        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?connect_timeout=30"
 
 # Mapeia nomes de ambiente para classes de configuração
 config_by_name = {
