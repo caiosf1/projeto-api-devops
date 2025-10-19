@@ -158,6 +158,8 @@ jobs:
           --name ${{ env.AZURE_CONTAINER_APP }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
           --image ${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
+          --min-replicas 1 \
+          --max-replicas 10 \
           --set-env-vars \
             FLASK_ENV=production \
             SECRET_KEY="${{ secrets.SECRET_KEY || 'fallback-key-123' }}" \
@@ -173,39 +175,69 @@ jobs:
     - name: '⏳ Aguardar Deploy Completar'
       run: |
         echo "⏳ Aguardando deploy finalizar..."
-        sleep 60  # Aguarda mais tempo para inicialização
+        sleep 30
         
-        # Verificar se nova revisão está ativa
-        REVISION=$(az containerapp revision list \
+        # Verificar status das revisões
+        echo "📋 Status das revisões:"
+        az containerapp revision list \
           --name ${{ env.AZURE_CONTAINER_APP }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --query "[?properties.active].name" -o tsv | head -1)
+          --query "[].{Name:name, Active:properties.active, Replicas:properties.replicas, Ready:properties.readyReplicas}" \
+          -o table
           
-        echo "📋 Revisão ativa: $REVISION"
+        # Obter URL atualizada
+        FQDN=$(az containerapp show \
+          --name ${{ env.AZURE_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --query "properties.configuration.ingress.fqdn" -o tsv)
+          
+        echo "🌐 URL da aplicação: https://$FQDN"
+        echo "FQDN=$FQDN" >> $GITHUB_ENV
         
     - name: '✅ Teste de Saúde do Deploy'
       run: |
         echo "🔍 Testando se API está respondendo..."
         
-        APP_URL="https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io"
+        APP_URL="https://$FQDN"
+        echo "🌐 Testando URL: $APP_URL"
+        
+        # Aguardar 60s para inicialização completa
+        echo "⏳ Aguardando 60s para app inicializar..."
+        sleep 60
         
         # Retry com timeout maior
         for i in {1..5}; do
           echo "🔄 Tentativa $i/5..."
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$APP_URL/health" || echo "000")
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 30 "$APP_URL/health" || echo "000")
           
           if [ "$HTTP_STATUS" = "200" ]; then
             echo "✅ API está funcionando! (Status: $HTTP_STATUS)"
+            
+            # Teste adicional na raiz
+            ROOT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 15 "$APP_URL/" || echo "000")
+            echo "🏠 Teste raiz: Status $ROOT_STATUS"
             exit 0
           else
             echo "⏳ API ainda não responde (Status: $HTTP_STATUS). Aguardando..."
+            
+            # Mostrar logs se disponível
+            echo "📋 Últimos logs:"
+            az containerapp logs show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 5 2>/dev/null || echo "Logs não disponíveis"
+            
             sleep 30
           fi
         done
         
         echo "❌ API não está respondendo após 5 tentativas (Status: $HTTP_STATUS)"
-        echo "🔍 Verificando logs do container..."
-        az containerapp logs show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 20 || echo "Não foi possível obter logs"
+        echo "🔍 Diagnóstico completo:"
+        
+        # Status das revisões
+        az containerapp revision list \
+          --name ${{ env.AZURE_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --query "[].{Name:name, Active:properties.active, Replicas:properties.replicas, Ready:properties.readyReplicas}" \
+          -o table
+          
         exit 1
         
         if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "404" ]; then
