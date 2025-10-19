@@ -27,4 +27,5 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 5000
 
 # 7. Script de entrada que aguarda PostgreSQL e depois inicia a app
-CMD ["sh", "-c", "python3 wait-for-postgres.py && python3 run.py"]
+# Se wait-for-postgres falhar, ainda assim inicia a app (modo degradado)
+CMD ["sh", "-c", "python3 wait-for-postgres.py || echo '⚠️ Iniciando em modo degradado' && python3 run.py"]

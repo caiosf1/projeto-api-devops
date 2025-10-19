@@ -386,36 +386,52 @@ def create_app(config_class='config.DevelopmentConfig'):
             return '', 204
 
     # 🗃️ INICIALIZAÇÃO DAS TABELAS NO BANCO
-    # Cria automaticamente as tabelas quando app inicia
-    # Essential para PostgreSQL em Container Apps!
-    with app.app_context():
-        max_retries = 5
-        retry_delay = 10  # segundos
+    # Inicialização lazy - não falha o startup se banco não estiver pronto
+    # Essential para Container Apps com startup assíncrono!
+    
+    def init_database():
+        """Inicializa banco de dados com retry robusto."""
+        max_retries = 10
+        retry_delay = 15  # segundos
         
-        for attempt in range(1, max_retries + 1):
-            try:
-                print(f"🔄 Tentativa {attempt}/{max_retries}: Conectando no banco de dados...")
-                
-                # Testa conexão primeiro
-                db.engine.execute('SELECT 1')
-                print("✅ Conexão com banco estabelecida!")
-                
-                # Cria tabelas
-                db.create_all()
-                print("✅ Tabelas criadas com sucesso!")
-                break
-                
-            except Exception as e:
-                print(f"❌ Tentativa {attempt} falhou: {e}")
-                
-                if attempt < max_retries:
-                    print(f"⏳ Aguardando {retry_delay}s antes da próxima tentativa...")
-                    import time
-                    time.sleep(retry_delay)
-                    retry_delay += 5  # Backoff progressivo
-                else:
-                    print("⚠️  Todas as tentativas falharam. App vai iniciar mesmo assim.")
-                    print("💡 Tabelas serão criadas na primeira requisição bem-sucedida.")
+        with app.app_context():
+            for attempt in range(1, max_retries + 1):
+                try:
+                    print(f"🔄 Tentativa {attempt}/{max_retries}: Conectando no banco de dados...")
+                    
+                    # Testa conexão primeiro
+                    result = db.engine.execute('SELECT 1').fetchone()
+                    if not result:
+                        raise Exception("Consulta retornou resultado vazio")
+                        
+                    print("✅ Conexão com banco estabelecida!")
+                    
+                    # Cria tabelas
+                    db.create_all()
+                    print("✅ Tabelas criadas com sucesso!")
+                    return True
+                    
+                except Exception as e:
+                    print(f"❌ Tentativa {attempt} falhou: {e}")
+                    
+                    if attempt < max_retries:
+                        print(f"⏳ Aguardando {retry_delay}s antes da próxima tentativa...")
+                        import time
+                        time.sleep(retry_delay)
+                        retry_delay = min(retry_delay + 10, 60)  # Backoff progressivo até 60s
+                    else:
+                        print("⚠️  Todas as tentativas falharam.")
+                        print("💡 App vai iniciar sem inicialização de banco.")
+                        print("� Tabelas serão criadas na primeira requisição bem-sucedida.")
+                        return False
+        return False
+    
+    # Tenta inicializar, mas não falha o startup
+    try:
+        init_database()
+    except Exception as e:
+        print(f"⚠️  Erro na inicialização do banco: {e}")
+        print("🚀 App vai iniciar mesmo assim - modo degradado.")
     
     return app
 
@@ -434,15 +450,22 @@ def health_check():
 def health_check_db():
     """Endpoint de verificação de saúde com teste de banco"""
     try:
-        # Testa conexão com banco
+        # Testa conexão com banco com timeout curto
         with app.app_context():
-            result = db.engine.execute('SELECT 1').fetchone()
+            # Configuração de timeout para health check
+            from sqlalchemy import text
+            result = db.engine.execute(text('SELECT 1')).fetchone()
             if result:
-                return {'status': 'healthy', 'database': 'connected'}, 200
+                # Tenta criar tabelas se não existirem (lazy initialization)
+                try:
+                    db.create_all()
+                    return {'status': 'healthy', 'database': 'connected', 'tables': 'ready'}, 200
+                except Exception as table_error:
+                    return {'status': 'healthy', 'database': 'connected', 'tables': 'error', 'table_error': str(table_error)}, 200
             else:
                 return {'status': 'unhealthy', 'database': 'no_result'}, 503
     except Exception as e:
-        return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)}, 503
+        return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)[:200]}, 503
 
 @app.route('/health/full')
 def health_check_full():

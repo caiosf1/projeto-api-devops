@@ -27,25 +27,46 @@ def wait_for_postgres():
     
     print(f"🔄 Aguardando PostgreSQL em {db_config['host']}:{db_config['port']}...")
     
-    max_retries = 30  # 30 tentativas = ~2 minutos
-    retry_interval = 5  # 5 segundos entre tentativas
+    max_retries = 60  # 60 tentativas = ~10 minutos (para Container Apps)
+    retry_interval = 10  # 10 segundos entre tentativas
     
     for attempt in range(1, max_retries + 1):
         try:
-            # Tenta conectar
-            conn = psycopg2.connect(**db_config, connect_timeout=10)
+            # Tenta conectar com timeout maior para Container Apps
+            conn = psycopg2.connect(**db_config, connect_timeout=30)
+            
+            # Testa se a conexão realmente funciona
+            cursor = conn.cursor()
+            cursor.execute('SELECT 1')
+            result = cursor.fetchone()
+            cursor.close()
             conn.close()
-            print(f"✅ PostgreSQL disponível após {attempt} tentativas!")
-            return True
+            
+            if result:
+                print(f"✅ PostgreSQL disponível e funcionando após {attempt} tentativas!")
+                return True
             
         except OperationalError as e:
-            print(f"⏳ Tentativa {attempt}/{max_retries}: {str(e)[:100]}...")
+            error_msg = str(e)
+            print(f"⏳ Tentativa {attempt}/{max_retries}: {error_msg[:150]}...")
             
-            if attempt < max_retries:
+            # Se for erro de timeout, aguarda mais
+            if "timeout" in error_msg.lower():
+                print("   🕐 Timeout detectado - aguardando mais tempo...")
+                time.sleep(retry_interval * 2)  # Aguarda dobrado em caso de timeout
+            elif "connection refused" in error_msg.lower():
+                print("   🔌 Conexão recusada - serviço pode estar iniciando...")
                 time.sleep(retry_interval)
             else:
-                print(f"❌ PostgreSQL não disponível após {max_retries} tentativas!")
-                return False
+                time.sleep(retry_interval)
+                
+        except Exception as e:
+            print(f"⚠️  Erro inesperado na tentativa {attempt}: {str(e)[:100]}...")
+            time.sleep(retry_interval)
+    
+    print(f"❌ PostgreSQL não disponível após {max_retries} tentativas ({max_retries * retry_interval / 60:.1f} minutos)!")
+    print("💡 Sugestão: Considere usar Azure Database for PostgreSQL para maior confiabilidade.")
+    return False
     
     return False
 
