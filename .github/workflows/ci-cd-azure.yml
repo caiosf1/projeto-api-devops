@@ -164,11 +164,12 @@ jobs:
             FLASK_ENV=production \
             SECRET_KEY="${{ secrets.SECRET_KEY || 'fallback-key-123' }}" \
             JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY || 'fallback-jwt-456' }}" \
-            POSTGRES_SERVER=postgres-app.internal.gentleisland-7ad00bd6.eastus.azurecontainerapps.io \
-            POSTGRES_USER=pgladmin \
-            POSTGRES_PASSWORD=MinhaSenh123 \
+            POSTGRES_SERVER=postgres-api-caio.postgres.database.azure.com \
+            POSTGRES_USER=pgadmin \
+            POSTGRES_PASSWORD='Senh@Forte123!' \
             POSTGRES_DB=apitodo \
             POSTGRES_PORT=5432 \
+            POSTGRES_SSL_MODE=require \
             GITHUB_SHA="${{ github.sha }}" \
             DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             
@@ -201,47 +202,26 @@ jobs:
         APP_URL="https://$FQDN"
         echo "🌐 Testando URL: $APP_URL"
         
-        # Aguardar 90s para inicialização completa (PostgreSQL + App)
-        echo "⏳ Aguardando 90s para app e PostgreSQL inicializarem..."
-        sleep 90
+        # Aguardar 60s para inicialização (Azure Database é mais rápido que Container Apps)
+        echo "⏳ Aguardando 60s para app inicializar..."
+        sleep 60
         
-        # Primeiro verificar se PostgreSQL está acessível
-        echo "🔍 Verificando conectividade com PostgreSQL..."
-        POSTGRES_STATUS=0
-        for i in {1..3}; do
-          echo "🔄 Testando PostgreSQL (tentativa $i/3)..."
-          POSTGRES_CHECK=$(az containerapp logs show --name postgres-app --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 3 2>/dev/null | grep -c "ready to accept connections" || echo "0")
-          
-          if [ "$POSTGRES_CHECK" -gt "0" ]; then
-            echo "✅ PostgreSQL está aceitando conexões!"
-            POSTGRES_STATUS=1
-            break
-          else
-            echo "⏳ PostgreSQL ainda inicializando..."
-            sleep 20
-          fi
-        done
-        
-        if [ "$POSTGRES_STATUS" = "0" ]; then
-          echo "⚠️  PostgreSQL pode não estar pronto. Continuando mesmo assim..."
-        fi
-        
-        # Retry com timeout maior e mais tentativas
-        for i in {1..8}; do
-          echo "🔄 Tentativa $i/8..."
+        # Retry com timeout adequado
+        for i in {1..5}; do
+          echo "🔄 Tentativa $i/5..."
           
           # Primeiro testa endpoint básico /health (não depende do banco)
-          HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 15 --max-time 45 "$APP_URL/health" || echo "000")
+          HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 30 "$APP_URL/health" || echo "000")
           
           if [ "$HEALTH_STATUS" = "200" ]; then
             echo "✅ API básica funcionando! (Status: $HEALTH_STATUS)"
             
             # Agora testa banco
-            DB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 15 --max-time 45 "$APP_URL/health/db" || echo "000")
+            DB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 15 --max-time 30 "$APP_URL/health/db" || echo "000")
             echo "🗄️ Teste banco: Status $DB_STATUS"
             
             if [ "$DB_STATUS" = "200" ]; then
-              echo "✅ Banco PostgreSQL conectado!"
+              echo "✅ Banco Azure PostgreSQL conectado!"
               
               # Teste final na raiz
               ROOT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 20 "$APP_URL/" || echo "000")
@@ -251,6 +231,8 @@ jobs:
               echo "📊 Informações completas de saúde:"
               curl -s --connect-timeout 10 --max-time 20 "$APP_URL/health/full" || echo "Health full não disponível"
               
+              echo ""
+              echo "🎉 Deploy bem-sucedido!"
               exit 0
             else
               echo "⚠️  API funciona mas banco tem problemas (Status DB: $DB_STATUS)"
@@ -261,22 +243,16 @@ jobs:
           fi
           
           # Mostrar logs se disponível
-          echo "📋 Últimos logs da API:"
-          az containerapp logs show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 5 2>/dev/null || echo "Logs não disponíveis"
-          
-          # A cada 3 tentativas, mostrar logs do PostgreSQL também
-          if [ $((i % 3)) -eq 0 ]; then
-            echo "📋 Últimos logs do PostgreSQL:"
-            az containerapp logs show --name postgres-app --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 3 2>/dev/null || echo "Logs PostgreSQL não disponíveis"
+          if [ $i -lt 5 ]; then
+            echo "📋 Últimos logs da API:"
+            az containerapp logs show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 5 2>/dev/null || echo "Logs não disponíveis"
+            
+            echo "⏳ Aguardando 30s antes da próxima tentativa..."
+            sleep 30
           fi
-          
-          # Intervalo progressivo: 30s, 45s, 60s...
-          SLEEP_TIME=$((30 + (i * 15)))
-          echo "⏳ Aguardando ${SLEEP_TIME}s antes da próxima tentativa..."
-          sleep $SLEEP_TIME
         done
         
-        echo "❌ API não está respondendo adequadamente após 8 tentativas"
+        echo "❌ API não está respondendo adequadamente após 5 tentativas"
         echo "🔍 Diagnóstico completo:"
         
         # Status das revisões
@@ -288,11 +264,8 @@ jobs:
           -o table
           
         # Logs finais detalhados
-        echo "📋 Logs finais da API (últimas 15 linhas):"
-        az containerapp logs show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 15 2>/dev/null || echo "Logs da API não disponíveis"
-        
-        echo "📋 Logs finais do PostgreSQL (últimas 10 linhas):"
-        az containerapp logs show --name postgres-app --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 10 2>/dev/null || echo "Logs do PostgreSQL não disponíveis"
+        echo "📋 Logs finais da API (últimas 20 linhas):"
+        az containerapp logs show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --tail 20 2>/dev/null || echo "Logs da API não disponíveis"
         
         # Verificar se há problemas de rede
         echo "🌐 Diagnóstico de conectividade:"
@@ -305,15 +278,11 @@ jobs:
         echo "- Testando endpoint /health/db..."
         curl -s --connect-timeout 10 "$APP_URL/health/db" || echo "  ❌ Endpoint /health/db não responde"
         
-        # Verificar se aplicação pelo menos subiu
-        echo "📊 Status final dos containers:"
-        az containerapp show --name ${{ env.AZURE_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.latestRevisionName" -o tsv
-        
         echo "💡 Possíveis causas:"
-        echo "1. PostgreSQL demorou mais que 8 tentativas para aceitar conexões"
+        echo "1. Azure Database for PostgreSQL com problemas de firewall"
         echo "2. Aplicação Flask teve erro na inicialização"
-        echo "3. Problema de conectividade de rede interna"
-        echo "4. Timeout insuficiente para cold start"
+        echo "3. Credenciais de banco incorretas"
+        echo "4. SSL/TLS configuration issue"
         
         exit 1
         

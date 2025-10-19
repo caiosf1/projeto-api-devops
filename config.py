@@ -26,26 +26,31 @@ class ProductionConfig(Config):
     """Configurações para ambiente de produção (Azure)."""
     DEBUG = False
     
-    # Configuração PostgreSQL para produção no Azure Container Apps
+    # Configuração PostgreSQL para produção no Azure
     database_url = os.getenv('DATABASE_URL')
     
     if database_url:
         # Azure fornece DATABASE_URL diretamente
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        # Container Apps PostgreSQL interno - SEMPRE use variáveis de ambiente!
+        # Azure Database for PostgreSQL ou Container Apps interno
         db_server = os.getenv('POSTGRES_SERVER', 'localhost')
         db_user = os.getenv('POSTGRES_USER', 'postgres')
-        db_password = os.getenv('POSTGRES_PASSWORD')  # ⚠️ OBRIGATÓRIA via env vars!
+        db_password = os.getenv('POSTGRES_PASSWORD')
         db_name = os.getenv('POSTGRES_DB', 'apitodo')
         db_port = os.getenv('POSTGRES_PORT', '5432')
+        ssl_mode = os.getenv('POSTGRES_SSL_MODE', 'prefer')  # prefer, require, disable
         
         # 🔐 Falha se não tiver senha configurada (segurança!)
         if not db_password:
             raise ValueError("❌ POSTGRES_PASSWORD deve ser definida via variável de ambiente!")
         
-        # Container Apps internal - configuração otimizada para conectividade robusta
-        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?connect_timeout=60&application_name=projeto-api-devops"
+        # Azure Database for PostgreSQL requer SSL
+        if ssl_mode == 'require':
+            SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?sslmode=require&connect_timeout=60&application_name=projeto-api-devops"
+        else:
+            # Container Apps internal ou SSL desabilitado
+            SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?connect_timeout=60&application_name=projeto-api-devops"
 
 # Mapeia nomes de ambiente para classes de configuração
 config_by_name = {
