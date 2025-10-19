@@ -2,7 +2,7 @@
 
 > Sistema completo de gerenciamento de tarefas com backend Flask e frontend Bootstrap 5
 
-[![CI/CD Pipeline](https://github.com/caiosf1/projeto-api-devops/actions/workflows/main.yml/badge.svg)](https://github.com/caiosf1/projeto-api-devops/actions)
+[![CI/CD Pipeline](https://github.com/caiosf1/projeto-api-devops/actions/workflows/ci-cd-azure.yml/badge.svg)](https://github.com/caiosf1/projeto-api-devops/actions)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](https://www.docker.com/)
