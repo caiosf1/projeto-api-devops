@@ -26,21 +26,21 @@ class ProductionConfig(Config):
     """Configurações para ambiente de produção (Azure)."""
     DEBUG = False
     
-    # Tenta pegar DATABASE_URL primeiro (Azure), senão constrói do PostgreSQL
+    # Configuração PostgreSQL para produção no Azure
     database_url = os.getenv('DATABASE_URL')
     
     if database_url:
-        # Azure fornece DATABASE_URL diretamente
+        # Azure fornece DATABASE_URL diretamente (PostgreSQL gerenciado)
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        # Constrói URL do PostgreSQL manualmente
-        db_user = os.getenv('POSTGRES_USER', 'caio')
-        db_password = os.getenv('POSTGRES_PASSWORD', 'minhasenha')
-        db_name = os.getenv('POSTGRES_DB', 'apitodo')
-        db_host = os.getenv('POSTGRES_HOST', 'db')
+        # Constrói URL do PostgreSQL Azure manualmente
+        db_server = os.getenv('POSTGRES_SERVER', 'projeto-postgres-server.postgres.database.azure.com')
+        db_user = os.getenv('POSTGRES_USER', 'pgadmin')
+        db_password = os.getenv('POSTGRES_PASSWORD', 'MinhaSenh@123!')
+        db_name = os.getenv('POSTGRES_DB', 'postgres')
         db_port = os.getenv('POSTGRES_PORT', '5432')
         
-        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?sslmode=require"
 
 # Mapeia nomes de ambiente para classes de configuração
 config_by_name = {
@@ -53,5 +53,3 @@ def get_config():
     """Retorna configuração baseada na variável FLASK_ENV."""
     env = os.getenv('FLASK_ENV', 'development')
     return config_by_name.get(env, DevelopmentConfig)
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:' # Usa um banco de dados em memória para testes

@@ -1,5 +1,6 @@
 // ========== CONFIGURAÇÃO ==========
-const API_URL = 'http://localhost:5000';
+// URL da API no Azure Container Apps
+const API_URL = 'https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io';
 
 // Elementos DOM
 const authScreen = document.getElementById('authScreen');
