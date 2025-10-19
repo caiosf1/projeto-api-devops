@@ -47,6 +47,12 @@ secrets.json
 *.pem
 *.key
 
+# Credenciais locais geradas por scripts
+.postgres_password
+.secret_key
+.jwt_secret_key
+.azure_credentials
+
 # ================================
 # BANCO DE DADOS
 # ================================
@@ -92,6 +98,12 @@ yarn-error.log*
 # (Mantém projeto limpo no GitHub)
 # ================================
 
+# Pasta de documentos pessoais
+docs/
+
+# Arquivo específico de problemas de entrevista
+PROBLEMAS_E_SOLUCOES_ENTREVISTA.md
+
 # Guias de aprendizado (básicos)
 COMECE_AQUI.md
 INICIO_RAPIDO.md
@@ -128,11 +140,46 @@ CHECKLIST.md
 INDICE_MESTRE.md
 INDICE_MESTRE_ATUALIZADO.md
 
+# Azure pipeline antigo (mantemos apenas o .github/workflows/)
+azure-pipelines.yml
+
 # Exercícios (pasta completa)
 exercicios/
 
 # Código em texto (snapshots)
 codigo_projeto_txt/
+
+# Scripts de utilidade locais (podem conter dados pessoais)
+# Mantém apenas scripts essenciais de desenvolvimento
+reset.sh
+start.sh
+stop.sh
+test.sh
+!scripts/*.sh  # Mantém scripts na pasta scripts/
+
+# Scripts de setup Azure (documentação local)
+fix-azure-deploy.sh
+create-azure-postgres.sh
+update-container-app-env.sh
+deploy-frontend-azure.sh
+setup-domain.sh
+setup-completo.sh
+
+# Documentação de setup Azure (local)
+ANALISE_PROJETO_AZURE.md
+GUIA_AZURE_POSTGRESQL.md
+GUIA_RAPIDO_DECISAO.md
+LEIA_PRIMEIRO_DEPLOY_AZURE.md
+REVISAO_COMPLETA_PROJETO.md
+SOLUCAO_FINAL.md
+DNS_CONFIG.md
+COMECE_AQUI_AGORA.md
+AZURE_POSTGRES_FIX.md
+AZURE.md
+
+# Logs de debug
+pytestdebug.log
+debug.log
 
 # ================================
 # OUTROS

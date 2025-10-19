@@ -1,6 +1,6 @@
 // ========== CONFIGURAÇÃO ==========
-// URL da API no Azure Container Apps
-const API_URL = 'https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io';
+// URL da API no Azure Container Apps com domínio personalizado
+const API_URL = 'https://api.caiodev.me';
 
 // Elementos DOM
 const authScreen = document.getElementById('authScreen');

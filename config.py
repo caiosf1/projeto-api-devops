@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -45,12 +46,15 @@ class ProductionConfig(Config):
         if not db_password:
             raise ValueError("❌ POSTGRES_PASSWORD deve ser definida via variável de ambiente!")
         
+        # 🔒 URL-encode da senha para lidar com caracteres especiais (@, !, etc)
+        db_password_encoded = quote_plus(db_password)
+        
         # Azure Database for PostgreSQL requer SSL
         if ssl_mode == 'require':
-            SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?sslmode=require&connect_timeout=60&application_name=projeto-api-devops"
+            SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password_encoded}@{db_server}:{db_port}/{db_name}?sslmode=require&connect_timeout=60&application_name=projeto-api-devops"
         else:
             # Container Apps internal ou SSL desabilitado
-            SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}?connect_timeout=60&application_name=projeto-api-devops"
+            SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password_encoded}@{db_server}:{db_port}/{db_name}?connect_timeout=60&application_name=projeto-api-devops"
 
 # Mapeia nomes de ambiente para classes de configuração
 config_by_name = {

@@ -162,11 +162,11 @@ jobs:
           --max-replicas 10 \
           --set-env-vars \
             FLASK_ENV=production \
-            SECRET_KEY="${{ secrets.SECRET_KEY || 'fallback-key-123' }}" \
-            JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY || 'fallback-jwt-456' }}" \
+            SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
             POSTGRES_SERVER=postgres-api-caio.postgres.database.azure.com \
             POSTGRES_USER=pgadmin \
-            POSTGRES_PASSWORD='Senh@Forte123!' \
+            POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
             POSTGRES_DB=apitodo \
             POSTGRES_PORT=5432 \
             POSTGRES_SSL_MODE=require \
