@@ -158,10 +158,15 @@ jobs:
           --name ${{ env.AZURE_CONTAINER_APP }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
           --image ${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
-          --environment-variables \
+          --set-env-vars \
             FLASK_ENV=production \
-            SECRET_KEY="${{ secrets.SECRET_KEY }}" \
-            JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
+            SECRET_KEY="${{ secrets.SECRET_KEY || 'fallback-key-123' }}" \
+            JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY || 'fallback-jwt-456' }}" \
+            POSTGRES_SERVER=postgres-app.internal.gentleisland-7ad00bd6.eastus.azurecontainerapps.io \
+            POSTGRES_USER=pgladmin \
+            POSTGRES_PASSWORD=MinhaSenh123 \
+            POSTGRES_DB=apitodo \
+            POSTGRES_PORT=5432 \
             GITHUB_SHA="${{ github.sha }}" \
             DEPLOY_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             
