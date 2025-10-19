@@ -21,8 +21,8 @@ services:
       timeout: 5s # Tempo máximo de resposta
       retries: 5 # Quantas vezes tentar antes de marcar como "unhealthy"
     environment:
-      - POSTGRES_USER=caio # Usuário do banco
-      - POSTGRES_PASSWORD=minhasenha # Senha do banco
+      - POSTGRES_USER=${POSTGRES_USER:-caio} # Usuário do banco (via .env)
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env} # Senha via .env
       - POSTGRES_DB=apitodo # Banco que será criado automaticamente
 
 # Definição dos volumes nomeados

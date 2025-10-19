@@ -1,8 +1,8 @@
 # ===================================================================================
-# 🚀 DOCKER COMPOSE PARA PRODUÇÃO AZURE
+# 🚀 DOCKER COMPOSE PARA PRODUÇÃO LOCAL
 # ===================================================================================
-# Este arquivo usa PostgreSQL como serviço separado para produção
-# Usado apenas para referência - no Azure usaremos PostgreSQL gerenciado
+# ⚠️  APENAS PARA DESENVOLVIMENTO LOCAL - Use variáveis de ambiente para senhas!
+# ⚠️  NO AZURE usamos PostgreSQL Container Apps (mais seguro)
 
 version: '3.8'
 
@@ -11,8 +11,8 @@ services:
     image: postgres:14-alpine
     environment:
       POSTGRES_DB: apitodo_prod
-      POSTGRES_USER: pgadmin
-      POSTGRES_PASSWORD: MinhaSenh@123!
+      POSTGRES_USER: ${POSTGRES_USER:-pgadmin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD deve ser definida no .env}
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     ports:
@@ -28,9 +28,12 @@ services:
     build: .
     environment:
       FLASK_ENV: production
-      SECRET_KEY: azure-secret-key-super-secure-2024
-      JWT_SECRET_KEY: azure-jwt-key-super-secure-2024
-      DATABASE_URL: postgresql://pgadmin:MinhaSenh@123!@db:5432/apitodo_prod
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY deve ser definida no .env}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY deve ser definida no .env}
+      POSTGRES_SERVER: db
+      POSTGRES_USER: ${POSTGRES_USER:-pgadmin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD deve ser definida no .env}
+      POSTGRES_DB: apitodo_prod
     ports:
       - "5000:5000"
     depends_on:

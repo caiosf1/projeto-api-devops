@@ -33,12 +33,16 @@ class ProductionConfig(Config):
         # Azure fornece DATABASE_URL diretamente
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        # Container Apps PostgreSQL interno
-        db_server = os.getenv('POSTGRES_SERVER', 'postgres-app.internal.gentleisland-7ad00bd6.eastus.azurecontainerapps.io')
-        db_user = os.getenv('POSTGRES_USER', 'pgladmin')
-        db_password = os.getenv('POSTGRES_PASSWORD', 'MinhaSenh123')
+        # Container Apps PostgreSQL interno - SEMPRE use variáveis de ambiente!
+        db_server = os.getenv('POSTGRES_SERVER', 'localhost')
+        db_user = os.getenv('POSTGRES_USER', 'postgres')
+        db_password = os.getenv('POSTGRES_PASSWORD')  # ⚠️ OBRIGATÓRIA via env vars!
         db_name = os.getenv('POSTGRES_DB', 'apitodo')
         db_port = os.getenv('POSTGRES_PORT', '5432')
+        
+        # 🔐 Falha se não tiver senha configurada (segurança!)
+        if not db_password:
+            raise ValueError("❌ POSTGRES_PASSWORD deve ser definida via variável de ambiente!")
         
         # Container Apps internal não usa SSL por padrão
         SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_server}:{db_port}/{db_name}"

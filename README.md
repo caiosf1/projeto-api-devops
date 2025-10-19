@@ -216,13 +216,43 @@ Banco de Dados (PostgreSQL)
 
 ---
 
-## 🔒 Segurança
+## 🔒 Segurança & Boas Práticas
 
-- ✅ Senhas hasheadas com **Bcrypt**
-- ✅ Autenticação stateless com **JWT**
-- ✅ Validação de entrada com **Pydantic**
-- ✅ Proteção contra SQL Injection (SQLAlchemy ORM)
-- ✅ Headers de segurança configurados
+### 🛡️ Segurança de Dados
+- ✅ **Senhas hasheadas** com Bcrypt (nunca texto plano)
+- ✅ **Autenticação JWT** stateless e segura
+- ✅ **Validação rigorosa** com Pydantic
+- ✅ **Proteção SQL Injection** via SQLAlchemy ORM
+- ✅ **Headers de segurança** configurados
+
+### 🔐 Gestão de Credenciais
+- ✅ **Variáveis de ambiente** para todas as senhas
+- ✅ **GitHub Secrets** para CI/CD (nunca hardcoded)
+- ✅ **Arquivo .env.example** como template seguro
+- ✅ **.gitignore** protege credenciais locais
+- 🚫 **ZERO senhas** no código fonte ou README
+
+### 📋 Como Configurar Credenciais
+
+**1️⃣ Desenvolvimento Local:**
+```bash
+# Copie o template
+cp .env.example .env
+
+# Gere chaves seguras
+python3 -c 'import secrets; print("SECRET_KEY:", secrets.token_hex(32))'
+python3 -c 'import secrets; print("JWT_SECRET_KEY:", secrets.token_hex(32))'
+
+# Configure no .env (nunca commite!)
+```
+
+**2️⃣ GitHub Actions (CI/CD):**
+- Configure todas as secrets em: `Settings → Secrets and variables → Actions`
+- Required: `DOCKER_USERNAME`, `DOCKER_TOKEN`, `SECRET_KEY`, `JWT_SECRET_KEY`
+
+**3️⃣ Azure Container Apps (Produção):**
+- Credenciais via `Environment Variables` no Container App
+- Conexão PostgreSQL via rede interna (mais segura)
 
 ---
 
@@ -277,10 +307,41 @@ Quer usar seu próprio domínio? É simples!
 
 ---
 
-## 📈 Próximos Passos
+## 🌐 **Deploy em Produção**
+
+### ✅ **Azure Container Apps** - Sistema Completo Funcionando
+
+**🚀 API Backend:** `https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io`
+- ✅ PostgreSQL Container Apps (interno)
+- ✅ Autenticação JWT funcionando
+- ✅ CRUD completo de tarefas
+- ✅ Documentação Swagger ativa
+
+**🔧 Infraestrutura:**
+- **Backend:** Azure Container Apps (0.5 CPU / 1Gi RAM)
+- **Database:** PostgreSQL 14-Alpine (Container Apps interno)
+- **CI/CD:** GitHub Actions (Build → Test → Deploy)
+- **Registry:** Docker Hub `caiosfdev/projeto-api-devops:latest`
+
+**🗃️ Configurações PostgreSQL (Produção):**
+```bash
+POSTGRES_SERVER=postgres-app.internal.[azure-domain]
+POSTGRES_USER=[configurado via secrets]
+POSTGRES_DB=apitodo
+POSTGRES_PORT=5432
+# 🔐 Credenciais via variáveis de ambiente (GitHub Secrets)
+```
+
+### 🔗 **Domínio Personalizado**
+Domain: `caiodev.me` (em configuração)
+- DNS configurado e propagado ✅
+- SSL automático via Container Apps ⏳
+
+### �📈 Próximos Passos
 
 - [x] **Deploy na Azure** - ✅ Funcionando com Azure Container Apps
-- [ ] **PostgreSQL** - Banco de dados gerenciado na nuvem  
+- [x] **PostgreSQL** - ✅ Rodando em Container Apps interno  
+- [x] **CI/CD Completo** - ✅ GitHub Actions funcionando
 - [ ] **Monitoramento** - Application Insights + métricas
 - [ ] **CDN** - Azure CDN para frontend estático
 
