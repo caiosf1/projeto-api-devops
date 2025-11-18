@@ -19,7 +19,7 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 🔷 **Destaques Azure:**
 - **100% hospedado na nuvem Azure** (Container Apps + Static Web Apps + PostgreSQL Flexible Server)
 - **CI/CD automatizado** via GitHub Actions → Azure
-- **Domínio personalizado** com SSL/TLS gratuito
+- **Domínio personalizado** (`caiodev.me`) com SSL/TLS automático
 - **Infraestrutura escalável** e pronta para produção
 
 O sistema permite que usuários criem contas, façam login e gerenciem suas tarefas com diferentes níveis de prioridade através de uma interface web moderna e responsiva.
@@ -41,7 +41,7 @@ O sistema permite que usuários criem contas, façam login e gerenciem suas tare
 - ✅ **Azure Database for PostgreSQL** - Banco gerenciado (Flexible Server)
 - ✅ **Docker** - Containerização completa (API + PostgreSQL)
 - ✅ **CI/CD Pipeline** - GitHub Actions integrado com Azure
-- ✅ **Domínio Personalizado** - SSL/TLS automático via Azure
+- ✅ **Domínio Personalizado** - `caiodev.me` com SSL/TLS automático via Azure
 - ✅ **Infraestrutura como Código** - Configurações versionadas
 - ✅ **Health Checks** - Monitoramento de disponibilidade
 
@@ -77,8 +77,8 @@ O sistema permite que usuários criem contas, façam login e gerenciem suas tare
 - ✅ **Azure CDN** - Distribuição global de conteúdo
 - ✅ Docker + Docker Compose
 - ✅ CI/CD com GitHub Actions integrado ao Azure
-- ✅ Configuração de domínios personalizados
-- ✅ SSL/TLS automático
+- ✅ Configuração de domínios personalizados com SSL/TLS
+- ✅ SSL/TLS automático (Let's Encrypt via Azure)
 - ✅ Environment variables e secrets management
 - ✅ Health checks e monitoramento
 - ✅ Auto-scaling e alta disponibilidade
@@ -381,7 +381,9 @@ python3 -c 'import secrets; print("JWT_SECRET_KEY:", secrets.token_hex(32))'
 
 ## 🌐 **Domínio Personalizado**
 
-Quer usar seu próprio domínio? É simples!
+✅ **Este projeto já usa domínio personalizado:** `caiodev.me` configurado e funcionando!
+
+**Quer usar seu próprio domínio no Azure?** É simples:
 
 ### **🚀 Configuração Automática:**
 ```bash
@@ -390,11 +392,10 @@ Quer usar seu próprio domínio? É simples!
 ```
 
 ### **⚙️ Configuração Manual:**
-1. Configure DNS: `CNAME api.meuapp.com.br → projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io`
-2. Adicione secret `CUSTOM_DOMAIN` no GitHub  
-3. Próximo deploy configurará SSL automaticamente!
-
-📖 **Para configurar domínio personalizado**, veja a documentação completa no projeto.
+1. Configure DNS: `CNAME api.meuapp.com.br → [seu-container-app].azurecontainerapps.io`
+2. No Azure Portal: Container App → Custom domains → Add custom domain
+3. Adicione secret `CUSTOM_DOMAIN` no GitHub (opcional para CI/CD)
+4. SSL/TLS é configurado automaticamente (Let's Encrypt)
 
 ---
 
@@ -409,35 +410,31 @@ Quer usar seu próprio domínio? É simples!
 ### ☁️ Infraestrutura Azure
 
 **🔷 Azure Container Apps (Backend)**
-- Hospedagem de containers serverless
-- Auto-scaling baseado em demanda (0.5-2 CPUs)
-- Integração com Azure Monitor
-- Domínio personalizado + SSL/TLS gerenciado
+- Hospedagem de containers serverless (0.5 CPU / 1Gi RAM)
+- Auto-scaling baseado em demanda
+- Domínio personalizado (`caiodev.me`) com SSL/TLS gerenciado
 - Deploy automatizado via GitHub Actions
 - Zero downtime deployments
+- Health checks automáticos
 
 **🔷 Azure Static Web Apps (Frontend)**
 - Hospedagem React com CDN global integrado
-- Deploy automático a cada commit
-- Staging environments para PRs
-- SSL/TLS incluído gratuitamente
+- Deploy automático a cada commit (GitHub Actions)
+- Domínio personalizado (`app.caiodev.me`) com SSL/TLS incluído
 - Free tier (sem custos)
 
 **🔷 Azure Database for PostgreSQL (Flexible Server)**
 - PostgreSQL 14 gerenciado
 - Backup automático diário (7 dias de retenção)
-- SSL/TLS obrigatório para conexões
+- SSL/TLS obrigatório
 - Firewall configurado (apenas Azure Container Apps)
-- Monitoramento de performance
-- High availability opcional
 
-**🔷 Recursos Azure Adicionais**
-- **Azure DNS**: Gerenciamento domínio personalizado
-- **Docker Hub**: Registry de imagens (integrado ao workflow)
-- **GitHub Actions**: CI/CD integrado com Azure
-- **Azure Key Vault**: Gerenciamento de secrets (opcional)
+**🔷 Recursos Adicionais**
+- **Azure DNS**: Gerenciamento domínio `caiodev.me`
+- **Docker Hub**: Registry de imagens
+- **GitHub Actions**: CI/CD integrado
 
-### CI/CD Pipeline (GitHub Actions → Azure)
+### 🔄 CI/CD Pipeline (GitHub Actions → Azure)
 
 **Fluxo Automatizado** a cada push para `main`:
 
@@ -469,66 +466,38 @@ Quer usar seu próprio domínio? É simples!
 - 🔄 Rollback automático se falhar
 - 📊 Logs completos no GitHub Actions
 
-### Secrets Necessários (GitHub → Azure)
+### 🔐 Secrets Necessários (GitHub)
 
-Configure no GitHub (`Settings → Secrets → Actions`):
+Configure em `Settings → Secrets → Actions`:
 
 **Docker Hub:**
 - `DOCKERHUB_USERNAME` - Usuário Docker Hub
-- `DOCKERHUB_TOKEN` - Token de acesso Docker Hub
+- `DOCKERHUB_TOKEN` - Token de acesso
 
 **Azure:**
-- `AZURE_CREDENTIALS` - Service Principal JSON (az ad sp create-for-rbac)
+- `AZURE_CREDENTIALS` - Service Principal JSON
 - `AZURE_STATIC_WEB_APPS_API_TOKEN` - Token Static Web Apps
 
 **Aplicação:**
 - `SECRET_KEY` - Chave secreta Flask
-- `JWT_SECRET_KEY` - Chave JWT para autenticação
-- `POSTGRES_PASSWORD` - Senha banco PostgreSQL Azure
+- `JWT_SECRET_KEY` - Chave JWT
+- `POSTGRES_PASSWORD` - Senha PostgreSQL Azure
 
 💡 **Nunca commite secrets no código!** Sempre use GitHub Secrets ou Azure Key Vault.
 
----
+### 📈 Status e Roadmap
 
----
+**✅ Funcionando:**
+- [x] Azure Container Apps + PostgreSQL
+- [x] Autenticação JWT completa
+- [x] CI/CD automatizado
+- [x] Domínio personalizado (`caiodev.me`) com SSL/TLS
+- [x] Frontend em Azure Static Web Apps
 
-## 🌐 **Deploy em Produção**
-
-### ✅ **Azure Container Apps** - Sistema Completo Funcionando
-
-**🚀 API Backend:** `https://projeto-api-caio.gentleisland-7ad00bd6.eastus.azurecontainerapps.io`
-- ✅ PostgreSQL Container Apps (interno)
-- ✅ Autenticação JWT funcionando
-- ✅ CRUD completo de tarefas
-- ✅ Documentação Swagger ativa
-
-**🔧 Infraestrutura:**
-- **Backend:** Azure Container Apps (0.5 CPU / 1Gi RAM)
-- **Database:** PostgreSQL 14-Alpine (Container Apps interno)
-- **CI/CD:** GitHub Actions (Build → Test → Deploy)
-- **Registry:** Docker Hub `caiosfdev/projeto-api-devops:latest`
-
-**🗃️ Configurações PostgreSQL (Produção):**
-```bash
-POSTGRES_SERVER=postgres-app.internal.[azure-domain]
-POSTGRES_USER=[configurado via secrets]
-POSTGRES_DB=apitodo
-POSTGRES_PORT=5432
-# 🔐 Credenciais via variáveis de ambiente (GitHub Secrets)
-```
-
-### 🔗 **Domínio Personalizado**
-Domain: `caiodev.me` (em configuração)
-- DNS configurado e propagado ✅
-- SSL automático via Container Apps ⏳
-
-### �📈 Próximos Passos
-
-- [x] **Deploy na Azure** - ✅ Funcionando com Azure Container Apps
-- [x] **PostgreSQL** - ✅ Rodando em Container Apps interno  
-- [x] **CI/CD Completo** - ✅ GitHub Actions funcionando
-- [ ] **Monitoramento** - Application Insights + métricas
-- [ ] **CDN** - Azure CDN para frontend estático
+**🔜 Próximos Passos:**
+- [ ] Application Insights (monitoramento avançado)
+- [ ] Azure CDN para otimização global
+- [ ] Auto-scaling baseado em métricas
 
 ---
 
