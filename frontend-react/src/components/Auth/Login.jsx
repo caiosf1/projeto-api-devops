@@ -1,3 +1,19 @@
+// ============================================================================
+// 🔓 LOGIN - PÁGINA DE AUTENTICAÇÃO
+// ============================================================================
+// Fluxo:
+// 1. Usuário digita email/senha
+// 2. Submit chama API de login
+// 3. Se sucesso: salva token no AuthContext e redireciona para /dashboard
+// 4. Se erro: exibe mensagem de erro
+//
+// RECURSOS:
+// - useForm: gerencia campos email/senha
+// - useApi: gerencia loading/error da requisição
+// - useAuth: acessa função login() do contexto
+// - Framer Motion: animações de entrada
+// - Mensagem condicional: "Bem-vindo" vs "Bem-vindo de Volta"
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
@@ -8,25 +24,33 @@ import { useForm, useApi } from '../../hooks';
 import { notify } from '../../utils/toast';
 
 function Login() {
-  const { values, handleChange } = useForm({ email: '', senha: '' });
-  const { loading, error, execute } = useApi();
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  // Custom hooks
+  const { values, handleChange } = useForm({ email: '', senha: '' });  // Gerencia form
+  const { loading, error, execute } = useApi();  // Gerencia chamada API
+  const navigate = useNavigate();  // Para redirecionar após login
+  const { login } = useAuth();  // Função login do contexto
   
-  // Verifica se usuário já logou antes (tem email salvo)
+  // Verifica se usuário já logou antes (para mensagem condicional)
   const hasLoggedBefore = localStorage.getItem('lastUserEmail');
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();  // Evita reload da página
     
     try {
+      // Chama API de login (retorna { access_token: '...' })
       const data = await execute(() => loginApi(values.email, values.senha));
+      
+      // Salva token e email no contexto global (via AuthContext)
       login(data.access_token, values.email);
+      
       // Salva email para mostrar "Bem-vindo de volta" na próxima vez
       localStorage.setItem('lastUserEmail', values.email);
+      
+      // Feedback visual e redirecionamento
       notify.success('Login realizado com sucesso!');
       navigate('/dashboard');
     } catch (err) {
+      // useApi já setou error, aqui só exibimos toast
       notify.error(error || 'Erro ao fazer login');
     }
   };

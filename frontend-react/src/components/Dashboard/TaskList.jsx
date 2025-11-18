@@ -1,3 +1,22 @@
+// ============================================================================
+// 📋 TASKLIST - LISTA DE TAREFAS COM FILTROS E ANIMAÇÕES
+// ============================================================================
+// Responsabilidades:
+// - Buscar tarefas da API ao montar componente
+// - Filtrar tarefas (todas/pendentes/concluídas)
+// - Toggle de conclusão (checkbox)
+// - Deletar tarefas com confirmação
+// - Exibir skeleton enquanto carrega
+// - Animar entrada/saída de itens (Framer Motion)
+//
+// ESTADO LOCAL:
+// - tarefas: array de objetos { id, descricao, prioridade, concluida }
+// - filtro: 'todas' | 'pendentes' | 'concluidas'
+//
+// PADRÃO DE ATUALIZAÇÃO:
+// Ao deletar/atualizar, atualiza estado local (setTarefas) sem recarregar
+// da API → atualização instantânea na UI (otimistic update)
+
 import { useState, useEffect } from 'react';
 import { Card, ListGroup, Badge, Button, Alert } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,42 +26,50 @@ import { notify } from '../../utils/toast';
 import TaskListSkeleton from './TaskListSkeleton';
 
 function TaskList() {
-  const [tarefas, setTarefas] = useState([]);
-  const [filtro, setFiltro] = useState('todas');
-  const { loading, error, execute } = useApi();
+  const [tarefas, setTarefas] = useState([]);  // Lista de tarefas
+  const [filtro, setFiltro] = useState('todas');  // Filtro ativo
+  const { loading, error, execute } = useApi();  // Para primeira carga
 
+  // Ao montar componente, busca tarefas da API
   useEffect(() => {
     carregarTarefas();
-  }, []);
+  }, []); // [] = executa apenas uma vez
 
   const carregarTarefas = async () => {
     try {
-      const data = await execute(getTarefas);
+      const data = await execute(getTarefas);  // GET /tarefas
       setTarefas(data);
     } catch (err) {
       notify.error('Erro ao carregar tarefas');
     }
   };
 
+  // Toggle de conclusão (checkbox)
   const toggleConcluida = async (id, concluida) => {
     try {
+      // Chama API para atualizar no backend
       await updateTarefa(id, { concluida: !concluida });
+      
+      // Atualiza estado local imediatamente (otimistic update)
       setTarefas(tarefas.map(t => 
         t.id === id ? { ...t, concluida: !concluida } : t
       ));
+      
       notify.success(!concluida ? 'Tarefa concluída! 🎉' : 'Tarefa reaberta');
     } catch (err) {
       notify.error('Erro ao atualizar tarefa');
     }
   };
 
+  // Deleta tarefa com confirmação
   const handleDelete = async (id) => {
     if (!window.confirm('Tem certeza que deseja deletar esta tarefa?')) {
-      return;
+      return;  // Cancelou
     }
 
     try {
-      await deleteTarefa(id);
+      await deleteTarefa(id);  // DELETE /tarefas/:id
+      // Remove do estado local
       setTarefas(tarefas.filter(t => t.id !== id));
       notify.info('Tarefa deletada');
     } catch (err) {
@@ -50,16 +77,18 @@ function TaskList() {
     }
   };
 
+  // Filtra tarefas com base no botão ativo
   const tarefasFiltradas = tarefas.filter(tarefa => {
     if (filtro === 'pendentes') return !tarefa.concluida;
     if (filtro === 'concluidas') return tarefa.concluida;
-    return true;
+    return true;  // 'todas'
   });
 
+  // Retorna cor do badge de prioridade
   const getPrioridadeVariant = (prioridade) => {
-    if (prioridade === 'alta') return 'danger';
-    if (prioridade === 'media') return 'warning';
-    return 'success';
+    if (prioridade === 'alta') return 'danger';    // Vermelho
+    if (prioridade === 'media') return 'warning';  // Amarelo
+    return 'success';  // Verde (baixa)
   };
 
   if (loading) {
