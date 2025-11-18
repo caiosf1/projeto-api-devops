@@ -1,64 +1,70 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { motion } from 'framer-motion';
 import { register as registerApi } from '../../services/api';
+import { useForm, useApi } from '../../hooks';
+import { notify } from '../../utils/toast';
 
 function Register() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [erro, setErro] = useState('');
+  const { values, handleChange, resetForm } = useForm({
+    email: '',
+    senha: '',
+    confirmarSenha: ''
+  });
+  const { loading, error, execute } = useApi();
   const [sucesso, setSucesso] = useState(false);
-  const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErro('');
-    setSucesso(false);
 
-    if (senha !== confirmarSenha) {
-      setErro('As senhas não coincidem');
+    if (values.senha !== values.confirmarSenha) {
+      notify.error('As senhas não coincidem');
       return;
     }
 
-    if (senha.length < 6) {
-      setErro('A senha deve ter pelo menos 6 caracteres');
+    if (values.senha.length < 6) {
+      notify.error('A senha deve ter pelo menos 6 caracteres');
       return;
     }
-
-    setLoading(true);
 
     try {
-      await registerApi(email, senha);
+      await execute(() => registerApi(values.email, values.senha));
       setSucesso(true);
+      notify.success('Conta criada com sucesso!');
+      resetForm();
       
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-      
-    } catch (error) {
-      if (error.response && error.response.data) {
-        setErro(error.response.data.erro || 'Erro ao criar conta');
-      } else {
-        setErro('Erro ao conectar com o servidor');
-      }
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      notify.error(error || 'Erro ao criar conta');
     }
   };
 
   return (
-    <div className="auth-container">
+    <motion.div
+      className="auth-container"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="auth-card">
         <div className="text-center mb-4">
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>✨</div>
+          <motion.div
+            style={{ fontSize: '4rem', marginBottom: '1rem' }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+          >
+            ✨
+          </motion.div>
           <h2>Criar Conta</h2>
           <p className="subtitle">Junte-se a nós e organize suas tarefas</p>
         </div>
 
-        {erro && <Alert variant="danger">{erro}</Alert>}
+        {error && <Alert variant="danger">{error}</Alert>}
         
         {sucesso && (
           <Alert variant="success">
@@ -71,9 +77,10 @@ function Register() {
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
+              name="email"
               placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={values.email}
+              onChange={handleChange}
               required
               disabled={loading || sucesso}
             />
@@ -83,9 +90,10 @@ function Register() {
             <Form.Label>Senha</Form.Label>
             <Form.Control
               type="password"
+              name="senha"
               placeholder="Mínimo 6 caracteres"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              value={values.senha}
+              onChange={handleChange}
               required
               disabled={loading || sucesso}
             />
@@ -95,9 +103,10 @@ function Register() {
             <Form.Label>Confirmar Senha</Form.Label>
             <Form.Control
               type="password"
+              name="confirmarSenha"
               placeholder="Digite a senha novamente"
-              value={confirmarSenha}
-              onChange={(e) => setConfirmarSenha(e.target.value)}
+              value={values.confirmarSenha}
+              onChange={handleChange}
               required
               disabled={loading || sucesso}
             />
@@ -109,7 +118,14 @@ function Register() {
             className="w-100 mb-3"
             disabled={loading || sucesso}
           >
-            {loading ? '⏳ Criando conta...' : '✨ Criar Conta'}
+            {loading ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Criando conta...
+              </>
+            ) : (
+              '✨ Criar Conta'
+            )}
           </Button>
         </Form>
 
@@ -119,7 +135,7 @@ function Register() {
           </small>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

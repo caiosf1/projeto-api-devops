@@ -1,27 +1,21 @@
-// ============================================================================
-// 🚀 APP.JSX - ROTAS DA APLICAÇÃO
-// ============================================================================
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import ProtectedRoute from './components/Layout/ProtectedRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Rota raiz redireciona para dashboard */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          
-          {/* Rotas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
-          {/* Rota protegida (precisa estar logado) */}
           <Route 
             path="/dashboard" 
             element={
@@ -31,6 +25,7 @@ function App() {
             } 
           />
         </Routes>
+        <ToastContainer />
       </BrowserRouter>
     </AuthProvider>
   );

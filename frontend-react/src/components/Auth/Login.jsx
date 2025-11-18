@@ -1,57 +1,63 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { motion } from 'framer-motion';
 import { login as loginApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useForm, useApi } from '../../hooks';
+import { notify } from '../../utils/toast';
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
-  const [loading, setLoading] = useState(false);
-
+  const { values, handleChange } = useForm({ email: '', senha: '' });
+  const { loading, error, execute } = useApi();
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErro('');
-    setLoading(true);
-
+    
     try {
-      const data = await loginApi(email, senha);
-      login(data.access_token, email);
+      const data = await execute(() => loginApi(values.email, values.senha));
+      login(data.access_token, values.email);
+      notify.success('Login realizado com sucesso!');
       navigate('/dashboard');
-    } catch (error) {
-      if (error.response && error.response.data) {
-        setErro(error.response.data.erro || 'Erro ao fazer login');
-      } else {
-        setErro('Erro ao conectar com o servidor');
-      }
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      notify.error(error || 'Erro ao fazer login');
     }
   };
 
   return (
-    <div className="auth-container">
+    <motion.div
+      className="auth-container"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="auth-card">
         <div className="text-center mb-4">
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚀</div>
+          <motion.div
+            style={{ fontSize: '4rem', marginBottom: '1rem' }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+          >
+            🚀
+          </motion.div>
           <h2>Bem-vindo de Volta!</h2>
           <p className="subtitle">Entre para gerenciar suas tarefas</p>
         </div>
 
-        {erro && <Alert variant="danger">{erro}</Alert>}
+        {error && <Alert variant="danger">{error}</Alert>}
 
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
+              name="email"
               placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={values.email}
+              onChange={handleChange}
               required
               disabled={loading}
             />
@@ -61,9 +67,10 @@ function Login() {
             <Form.Label>Senha</Form.Label>
             <Form.Control
               type="password"
+              name="senha"
               placeholder="••••••••"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              value={values.senha}
+              onChange={handleChange}
               required
               disabled={loading}
             />
@@ -75,7 +82,14 @@ function Login() {
             className="w-100 mb-3"
             disabled={loading}
           >
-            {loading ? '⏳ Entrando...' : '🚀 Entrar'}
+            {loading ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Entrando...
+              </>
+            ) : (
+              '🚀 Entrar'
+            )}
           </Button>
         </Form>
 
@@ -85,7 +99,7 @@ function Login() {
           </small>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
