@@ -1,11 +1,13 @@
 # 📋 Gerenciador de Tarefas Full-Stack
 
-> Sistema completo de gerenciamento de tarefas com backend Flask e frontend Bootstrap 5
+> Sistema completo de gerenciamento de tarefas com backend Flask, frontend React e DevOps na Azure
 
 [![CI/CD Pipeline](https://github.com/caiosf1/projeto-api-devops/actions/workflows/ci-cd-azure.yml/badge.svg)](https://github.com/caiosf1/projeto-api-devops/actions)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Flask](https://img.shields.io/badge/flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
+[![React 18](https://img.shields.io/badge/react-18-61dafb.svg)](https://react.dev/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](https://www.docker.com/)
+
+🌐 **[Ver Aplicação ao Vivo](https://app.caiodev.me)** | 📚 **[Documentação API](https://api.caiodev.me/docs)**
 
 ---
 
@@ -33,11 +35,13 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 - ✅ **Health Checks** - Endpoints de monitoramento
 
 **💻 Frontend (Interface Web):**
-- ✅ **Dashboard Interativo** - Vanilla JS + Bootstrap 5
-- ✅ **Sistema de Login/Registro** - Autenticação completa
-- ✅ **Gestão de Tarefas** - CRUD completo via API
-- ✅ **Design Responsivo** - Mobile-first
-- ✅ **Versão React** - React 18 + Vite + React Bootstrap + React Router + Context API (frontend-react/)
+- ✅ **React 18** - Hooks, Context API, React Router
+- ✅ **Vite** - Build tool moderno e rápido
+- ✅ **React Bootstrap** - Componentes responsivos
+- ✅ **Framer Motion** - Animações suaves
+- ✅ **React Toastify** - Notificações toast
+- ✅ **Custom Hooks** - useForm, useApi, useLocalStorage
+- ✅ **Axios Interceptors** - JWT automático
 
 ---
 
@@ -100,10 +104,13 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 - **Pydantic** (Validação de dados)
 
 ### Frontend
-- **HTML5** | **CSS3** | **JavaScript ES6+**
-- **Bootstrap 5** (Framework CSS responsivo)
-- **Bootstrap Icons** (Ícones)
-- **Fetch API** (Comunicação com backend)
+- **React 18** - Hooks (useState, useEffect, useContext)
+- **React Router v6** - Navegação SPA com rotas protegidas
+- **React Bootstrap** - Componentes UI responsivos
+- **Vite 5** - Build tool ultrarrápido
+- **Axios** - HTTP client com interceptors JWT
+- **Framer Motion** - Animações declarativas
+- **React Toastify** - Sistema de notificações
 
 ### DevOps
 - **Docker** + **Docker Compose** (Containerização)
@@ -115,12 +122,13 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 
 ## 🚀 Como Usar
 
-### 🌐 Versão em Produção (Pronto para Usar!)
+### 🌐 Versão em Produção
 
-**A aplicação já está no ar! Acesse agora:**
+**A aplicação está ao vivo!**
 
-🎨 **Frontend**: [https://app.caiodev.me](https://app.caiodev.me)  
-🔌 **API**: [https://api.caiodev.me/docs](https://api.caiodev.me/docs)
+- 🎨 **Frontend React**: https://app.caiodev.me
+- 🔌 **API REST**: https://api.caiodev.me
+- 📚 **Swagger Docs**: https://api.caiodev.me/docs
 
 Crie sua conta e comece a usar imediatamente!
 
@@ -141,19 +149,17 @@ Crie sua conta e comece a usar imediatamente!
 git clone https://github.com/caiosf1/projeto-api-devops.git
 cd projeto-api-devops
 
-# 2. Crie o arquivo .env (use o .env.example como base)
+# 2. Configure variáveis de ambiente
 cp .env.example .env
+# Edite .env com suas credenciais
 
-# 3. Suba o backend (API + Banco)
+# 3. Suba o ambiente completo
 docker-compose up --build
 
-# 4. Em outro terminal, suba o frontend
-cd frontend
-python3 -m http.server 8080
-
-# 5. Acesse a aplicação:
-# Frontend: http://localhost:8080
-# API Docs: http://localhost:5000/docs
+# 4. Acesse a aplicação:
+# - API: http://localhost:5000
+# - API Docs: http://localhost:5000/docs
+# - Frontend React: http://localhost:3000 (se rodar npm run dev em frontend-react/)
 ```
 
 ### Opção 2: Desenvolvimento Local
@@ -187,32 +193,20 @@ python run.py
 
 ## 📚 Documentação da API
 
-### 🌐 Aplicação em Produção
-
-**Frontend:** [https://app.caiodev.me](https://app.caiodev.me)  
-**API Backend:** [https://api.caiodev.me](https://api.caiodev.me)  
-**Swagger Docs:** [https://api.caiodev.me/docs](https://api.caiodev.me/docs)
-
 ### Endpoints Principais
 
 #### Autenticação
+- `POST /auth/register` - Criar nova conta
+- `POST /auth/login` - Login (retorna JWT token)
 
-| Método | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| POST | `/auth/register` | Registrar novo usuário | Não |
-| POST | `/auth/login` | Fazer login e obter token JWT | Não |
+#### Tarefas (🔒 Requer autenticação JWT)
+- `GET /tarefas` - Listar tarefas do usuário
+- `POST /tarefas` - Criar nova tarefa
+- `GET /tarefas/{id}` - Buscar tarefa específica
+- `PUT /tarefas/{id}` - Atualizar tarefa
+- `DELETE /tarefas/{id}` - Deletar tarefa
 
-#### Tarefas
-
-| Método | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| GET | `/tarefas` | Listar todas as tarefas | JWT |
-| POST | `/tarefas` | Criar nova tarefa | JWT |
-| GET | `/tarefas/{id}` | Buscar tarefa específica | JWT |
-| PUT | `/tarefas/{id}` | Atualizar tarefa | JWT |
-| DELETE | `/tarefas/{id}` | Deletar tarefa | JWT |
-
-### Exemplo de Uso (Produção)
+### Exemplo de Uso
 
 ```bash
 # 1. Registrar usuário
@@ -259,20 +253,26 @@ pytest tests/test_api.py -v
 
 ```
 projeto-api-devops/
-├── frontend/              # Interface web
-│   ├── index.html         # Página principal
-│   ├── app.js             # Lógica JavaScript
-│   └── style.css          # Estilos customizados
-├── app.py                 # Backend - API REST
-├── config.py              # Configurações de ambiente
-├── schemas.py             # Validação de dados
-├── requirements.txt       # Dependências Python
-├── Dockerfile             # Container da aplicação
-├── docker-compose.yml     # Orquestração (API + DB)
-├── tests/                 # Testes automatizados
-│   └── test_api.py        # 12 testes com pytest
-└── .github/workflows/     # CI/CD Pipeline
-    └── main.yml
+├── frontend-react/          # Frontend React 18
+│   ├── src/
+│   │   ├── components/      # Componentes React
+│   │   ├── context/         # Context API (AuthContext)
+│   │   ├── hooks/           # Custom hooks
+│   │   ├── services/        # API service (Axios)
+│   │   └── App.jsx          # App principal
+│   ├── package.json
+│   └── vite.config.js
+├── app.py                   # Backend - API REST Flask
+├── config.py                # Configurações ambiente
+├── schemas.py               # Validação Pydantic
+├── requirements.txt         # Dependências Python
+├── Dockerfile               # Container da aplicação
+├── docker-compose.yml       # Orquestração (API + PostgreSQL)
+├── tests/                   # Testes automatizados
+│   └── test_api.py
+└── .github/workflows/       # CI/CD Pipeline
+    ├── ci-cd-azure.yml      # Deploy backend
+    └── azure-static-web-apps-*.yml  # Deploy frontend
 ```
 
 ### Fluxo de Funcionamento
@@ -372,48 +372,54 @@ Quer usar seu próprio domínio? É simples!
 2. Adicione secret `CUSTOM_DOMAIN` no GitHub  
 3. Próximo deploy configurará SSL automaticamente!
 
-📖 **[Guia Completo de Domínio Personalizado](docs/DOMINIO-PERSONALIZADO.md)**
+📖 **Para configurar domínio personalizado**, veja a documentação completa no projeto.
 
 ---
 
-## � Deploy em Produção
+## 🌐 Deploy em Produção
 
-### 🚀 Aplicação no Ar
+### Aplicação no Ar
 
-**Frontend:** [https://app.caiodev.me](https://app.caiodev.me)  
-**API Backend:** [https://api.caiodev.me](https://api.caiodev.me)  
-**Documentação:** [https://api.caiodev.me/docs](https://api.caiodev.me/docs)
+- 🎨 **Frontend React**: https://app.caiodev.me
+- 🔌 **API Backend**: https://api.caiodev.me
+- 📚 **Documentação**: https://api.caiodev.me/docs
 
-### ✅ Infraestrutura Azure
+### Infraestrutura Azure
 
-**Backend (Azure Container Apps):**
-- Container Apps com auto-scaling
-- Domínio personalizado com SSL automático
-- 0.5 CPU / 1Gi RAM (Consumption tier)
+**Backend (Azure Container Apps)**
+- Container Apps com auto-scaling  
+- Domínio personalizado + SSL automático
 - CI/CD via GitHub Actions
+- Registry: Docker Hub
 
-**Frontend (Azure Static Web Apps):**
-- Hospedagem estática (Free tier)
-- Domínio personalizado configurado
-- Deploy automático via GitHub Actions
-- CDN global integrado
+**Frontend (Azure Static Web Apps)**
+- Hospedagem React com CDN global
+- Deploy automático de cada commit
+- Free tier
 
-**Banco de Dados (Azure Database for PostgreSQL):**
+**Banco de Dados (Azure PostgreSQL)**
 - PostgreSQL 14 Flexible Server
-- Standard_B1ms (1 vCore, 2GB RAM)
-- 32GB storage com backup automático
+- Backup automático diário
 - SSL/TLS obrigatório
+- Credenciais via environment variables
 
-**Registry:** Docker Hub `caiosfdev/projeto-api-devops:latest`
+### CI/CD Pipeline
 
-### 🔒 Segurança em Produção
+Cada push para `main` automaticamente:
+1. 🧪 Roda 12 testes (pytest)
+2. 🐳 Builda imagem Docker
+3. 📤 Push para Docker Hub
+4. 🔍 Scan de segurança (Trivy)
+5. 🚀 Deploy Azure Container Apps
+6. ✅ Health checks automáticos
 
-- ✅ Todas as credenciais via GitHub Secrets
-- ✅ SSL/TLS automático (Let's Encrypt)
-- ✅ Senhas hasheadas com Bcrypt
-- ✅ Autenticação JWT stateless
-- ✅ PostgreSQL com SSL obrigatório
-- ✅ Variáveis de ambiente protegidas
+### Secrets Necessários
+
+Configure no GitHub (`Settings → Secrets → Actions`):
+- `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN`
+- `AZURE_CREDENTIALS` (Service Principal)
+- `SECRET_KEY` / `JWT_SECRET_KEY`
+- `POSTGRES_PASSWORD`
 
 ---
 
