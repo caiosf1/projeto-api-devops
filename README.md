@@ -1,19 +1,28 @@
 # 📋 Gerenciador de Tarefas Full-Stack
 
-> Sistema completo de gerenciamento de tarefas com backend Flask, frontend React e DevOps na Azure
+> Sistema completo de gerenciamento de tarefas com backend Flask, frontend React e **infraestrutura 100% Azure Cloud**
 
 [![CI/CD Pipeline](https://github.com/caiosf1/projeto-api-devops/actions/workflows/ci-cd-azure.yml/badge.svg)](https://github.com/caiosf1/projeto-api-devops/actions)
+[![Azure](https://img.shields.io/badge/Azure-Container%20Apps-0078D4?logo=microsoftazure)](https://azure.microsoft.com/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![React 18](https://img.shields.io/badge/react-18-61dafb.svg)](https://react.dev/)
 [![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](https://www.docker.com/)
 
-🌐 **[Ver Aplicação ao Vivo](https://app.caiodev.me)** | 📚 **[Documentação API](https://api.caiodev.me/docs)**
+🌐 **[Ver Aplicação ao Vivo](https://app.caiodev.me)** | 📚 **[Documentação API](https://api.caiodev.me/docs)** | ☁️ **Hospedado em Azure**
 
 ---
 
 ## 🎯 Sobre o Projeto
 
-Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvida como projeto de estudos em desenvolvimento web e DevOps. O sistema permite que usuários criem contas, façam login e gerenciem suas tarefas com diferentes níveis de prioridade através de uma interface web moderna e responsiva.
+Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvida como projeto de estudos em **desenvolvimento web, DevOps e Azure Cloud**. 
+
+🔷 **Destaques Azure:**
+- **100% hospedado na nuvem Azure** (Container Apps + Static Web Apps + PostgreSQL Flexible Server)
+- **CI/CD automatizado** via GitHub Actions → Azure
+- **Domínio personalizado** com SSL/TLS gratuito
+- **Infraestrutura escalável** e pronta para produção
+
+O sistema permite que usuários criem contas, façam login e gerenciem suas tarefas com diferentes níveis de prioridade através de uma interface web moderna e responsiva.
 
 ### 🌟 O Que Foi Implementado
 
@@ -26,13 +35,15 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 - ✅ **ORM SQLAlchemy** - Migrations com Alembic
 - ✅ **PostgreSQL** - Banco de dados em produção
 
-**🚀 DevOps & Infraestrutura - Destaque:**
+**🚀 DevOps & Azure Cloud - Destaque Principal:**
+- ✅ **Azure Container Apps** - Deploy backend containerizado com auto-scaling
+- ✅ **Azure Static Web Apps** - Hospedagem React com CDN global
+- ✅ **Azure Database for PostgreSQL** - Banco gerenciado (Flexible Server)
 - ✅ **Docker** - Containerização completa (API + PostgreSQL)
-- ✅ **CI/CD Pipeline** - GitHub Actions (Test → Build → Deploy)
-- ✅ **Azure Container Apps** - Deploy automatizado
-- ✅ **Azure PostgreSQL** - Banco gerenciado
-- ✅ **Domínio Personalizado** - SSL automático (Let's Encrypt)
-- ✅ **Health Checks** - Endpoints de monitoramento
+- ✅ **CI/CD Pipeline** - GitHub Actions integrado com Azure
+- ✅ **Domínio Personalizado** - SSL/TLS automático via Azure
+- ✅ **Infraestrutura como Código** - Configurações versionadas
+- ✅ **Health Checks** - Monitoramento de disponibilidade
 
 **💻 Frontend (Interface Web):**
 - ✅ **React 18** - Hooks, Context API, React Router
@@ -59,15 +70,18 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 - ✅ Tratamento de erros e exceções
 - ✅ Segurança (bcrypt, CORS, SQL injection prevention)
 
-### DevOps & Cloud
+### DevOps & Cloud (Azure)
+- ✅ **Azure Container Apps** - Serverless containers
+- ✅ **Azure Static Web Apps** - Hospedagem frontend
+- ✅ **Azure PostgreSQL Flexible Server** - Banco gerenciado
+- ✅ **Azure CDN** - Distribuição global de conteúdo
 - ✅ Docker + Docker Compose
-- ✅ CI/CD com GitHub Actions
-- ✅ Deploy Azure Container Apps
-- ✅ Azure Database for PostgreSQL
+- ✅ CI/CD com GitHub Actions integrado ao Azure
 - ✅ Configuração de domínios personalizados
 - ✅ SSL/TLS automático
 - ✅ Environment variables e secrets management
 - ✅ Health checks e monitoramento
+- ✅ Auto-scaling e alta disponibilidade
 
 ### Testes & Qualidade
 - ✅ Testes automatizados com pytest
@@ -114,9 +128,17 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 
 ### DevOps
 - **Docker** + **Docker Compose** (Containerização)
-- **GitHub Actions** (CI/CD)
+- **GitHub Actions** (CI/CD integrado com Azure)
 - **pytest** (Testes automatizados)
 - **Alembic** (Migrações de banco)
+- **Azure CLI** (Automação de deploy)
+
+### Azure Cloud Services
+- **Azure Container Apps** - Backend containerizado
+- **Azure Static Web Apps** - Frontend React
+- **Azure Database for PostgreSQL** - Flexible Server
+- **Azure Container Registry / Docker Hub** - Imagens Docker
+- **Azure DNS** - Gerenciamento de domínio
 
 ---
 
@@ -376,50 +398,95 @@ Quer usar seu próprio domínio? É simples!
 
 ---
 
-## 🌐 Deploy em Produção
+## 🌐 Deploy em Produção (Azure Cloud)
 
-### Aplicação no Ar
+### 🎯 Aplicação ao Vivo
 
-- 🎨 **Frontend React**: https://app.caiodev.me
-- 🔌 **API Backend**: https://api.caiodev.me
-- 📚 **Documentação**: https://api.caiodev.me/docs
+- 🎨 **Frontend React**: https://app.caiodev.me (Azure Static Web Apps)
+- 🔌 **API Backend**: https://api.caiodev.me (Azure Container Apps)
+- 📚 **Documentação**: https://api.caiodev.me/docs (Swagger UI)
 
-### Infraestrutura Azure
+### ☁️ Infraestrutura Azure
 
-**Backend (Azure Container Apps)**
-- Container Apps com auto-scaling  
-- Domínio personalizado + SSL automático
-- CI/CD via GitHub Actions
-- Registry: Docker Hub
+**🔷 Azure Container Apps (Backend)**
+- Hospedagem de containers serverless
+- Auto-scaling baseado em demanda (0.5-2 CPUs)
+- Integração com Azure Monitor
+- Domínio personalizado + SSL/TLS gerenciado
+- Deploy automatizado via GitHub Actions
+- Zero downtime deployments
 
-**Frontend (Azure Static Web Apps)**
-- Hospedagem React com CDN global
-- Deploy automático de cada commit
-- Free tier
+**🔷 Azure Static Web Apps (Frontend)**
+- Hospedagem React com CDN global integrado
+- Deploy automático a cada commit
+- Staging environments para PRs
+- SSL/TLS incluído gratuitamente
+- Free tier (sem custos)
 
-**Banco de Dados (Azure PostgreSQL)**
-- PostgreSQL 14 Flexible Server
-- Backup automático diário
-- SSL/TLS obrigatório
-- Credenciais via environment variables
+**🔷 Azure Database for PostgreSQL (Flexible Server)**
+- PostgreSQL 14 gerenciado
+- Backup automático diário (7 dias de retenção)
+- SSL/TLS obrigatório para conexões
+- Firewall configurado (apenas Azure Container Apps)
+- Monitoramento de performance
+- High availability opcional
 
-### CI/CD Pipeline
+**🔷 Recursos Azure Adicionais**
+- **Azure DNS**: Gerenciamento domínio personalizado
+- **Docker Hub**: Registry de imagens (integrado ao workflow)
+- **GitHub Actions**: CI/CD integrado com Azure
+- **Azure Key Vault**: Gerenciamento de secrets (opcional)
 
-Cada push para `main` automaticamente:
-1. 🧪 Roda 12 testes (pytest)
-2. 🐳 Builda imagem Docker
-3. 📤 Push para Docker Hub
-4. 🔍 Scan de segurança (Trivy)
-5. 🚀 Deploy Azure Container Apps
-6. ✅ Health checks automáticos
+### CI/CD Pipeline (GitHub Actions → Azure)
 
-### Secrets Necessários
+**Fluxo Automatizado** a cada push para `main`:
+
+```
+📝 Commit & Push
+    ↓
+🔍 GitHub Actions detecta mudança
+    ↓
+🧪 Roda 12 testes (pytest)
+    ↓
+✅ Testes passaram?
+    ↓
+🐳 Build imagem Docker
+    ↓
+📤 Push Docker Hub (caiosfdev/projeto-api-devops:latest)
+    ↓
+🔍 Scan segurança (Trivy - vulnerabilidades)
+    ↓
+☁️ Deploy Azure Container Apps
+    ↓
+✅ Health checks automáticos
+    ↓
+🎉 Aplicação atualizada em produção!
+```
+
+**Benefícios:**
+- ⚡ Deploy em ~5 minutos
+- 🛡️ Apenas código testado vai para produção
+- 🔄 Rollback automático se falhar
+- 📊 Logs completos no GitHub Actions
+
+### Secrets Necessários (GitHub → Azure)
 
 Configure no GitHub (`Settings → Secrets → Actions`):
-- `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN`
-- `AZURE_CREDENTIALS` (Service Principal)
-- `SECRET_KEY` / `JWT_SECRET_KEY`
-- `POSTGRES_PASSWORD`
+
+**Docker Hub:**
+- `DOCKERHUB_USERNAME` - Usuário Docker Hub
+- `DOCKERHUB_TOKEN` - Token de acesso Docker Hub
+
+**Azure:**
+- `AZURE_CREDENTIALS` - Service Principal JSON (az ad sp create-for-rbac)
+- `AZURE_STATIC_WEB_APPS_API_TOKEN` - Token Static Web Apps
+
+**Aplicação:**
+- `SECRET_KEY` - Chave secreta Flask
+- `JWT_SECRET_KEY` - Chave JWT para autenticação
+- `POSTGRES_PASSWORD` - Senha banco PostgreSQL Azure
+
+💡 **Nunca commite secrets no código!** Sempre use GitHub Secrets ou Azure Key Vault.
 
 ---
 
