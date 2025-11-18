@@ -189,6 +189,10 @@ INSTRUCOES_CURRICULO.md
 RESUMO_*.md
 PROJETO_COMPLETO.md
 REACT_COMPLETO.md
+GUIA_ENTREVISTAS.md
+
+# Instruções para agentes IA (contém estratégias internas)
+.github/copilot-instructions.md
 
 # DNS e configurações específicas
 DNS_FRONTEND.md
