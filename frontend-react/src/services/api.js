@@ -17,7 +17,9 @@ const api = axios.create({
   baseURL: 'https://api.caiodev.me',  // URL base do seu backend Flask
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 15000,  // Timeout de 15 segundos
+  withCredentials: false  // Não envia cookies (usa JWT no header)
 });
 
 // ============================================================================
@@ -60,6 +62,14 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Log de debug para ver o erro exato
+    console.error('API Error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      url: error.config?.url
+    });
+    
     // Se for erro 401 (token expirado ou inválido)
     if (error.response && error.response.status === 401) {
       // Limpa o token
