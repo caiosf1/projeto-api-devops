@@ -463,7 +463,7 @@ python3 -c 'import secrets; print("JWT_SECRET_KEY:", secrets.token_hex(32))'
 **Benefícios:**
 - ⚡ Deploy em ~5 minutos
 - 🛡️ Apenas código testado vai para produção
-- 🔄 Rollback automático se falhar
+- ✅ Health checks automáticos (falha se API não responder)
 - 📊 Logs completos no GitHub Actions
 
 ### 🔐 Secrets Necessários (GitHub)
