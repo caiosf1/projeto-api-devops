@@ -12,6 +12,9 @@ function Login() {
   const { loading, error, execute } = useApi();
   const navigate = useNavigate();
   const { login } = useAuth();
+  
+  // Verifica se usuário já logou antes (tem email salvo)
+  const hasLoggedBefore = localStorage.getItem('lastUserEmail');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +22,8 @@ function Login() {
     try {
       const data = await execute(() => loginApi(values.email, values.senha));
       login(data.access_token, values.email);
+      // Salva email para mostrar "Bem-vindo de volta" na próxima vez
+      localStorage.setItem('lastUserEmail', values.email);
       notify.success('Login realizado com sucesso!');
       navigate('/dashboard');
     } catch (err) {
@@ -43,8 +48,10 @@ function Login() {
           >
             🚀
           </motion.div>
-          <h2>Bem-vindo de Volta!</h2>
-          <p className="subtitle">Entre para gerenciar suas tarefas</p>
+          <h2>{hasLoggedBefore ? 'Bem-vindo de Volta!' : 'Bem-vindo!'}</h2>
+          <p className="subtitle">
+            {hasLoggedBefore ? 'Entre para gerenciar suas tarefas' : 'Faça login para começar'}
+          </p>
         </div>
 
         {error && <Alert variant="danger">{error}</Alert>}
