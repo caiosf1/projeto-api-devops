@@ -177,6 +177,26 @@ COMECE_AQUI_AGORA.md
 AZURE_POSTGRES_FIX.md
 AZURE.md
 
+# ================================
+# ARQUIVOS PESSOAIS
+# ================================
+# Currículos e documentos pessoais
+CURRICULO_*.md
+CURRICULO_*.html
+INSTRUCOES_CURRICULO.md
+
+# Resumos e notas pessoais
+RESUMO_*.md
+PROJETO_COMPLETO.md
+REACT_COMPLETO.md
+
+# DNS e configurações específicas
+DNS_FRONTEND.md
+DNS_PASSO_A_PASSO.md
+
+# Scripts de deploy temporários
+deploy-frontend-simples.sh
+
 # Logs de debug
 pytestdebug.log
 debug.log

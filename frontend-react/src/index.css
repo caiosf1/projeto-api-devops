@@ -1,0 +1,569 @@
+/* ============================================================================
+   🎨 ESTILOS GLOBAIS - DESIGN MODERNO
+   ============================================================================ */
+
+:root {
+  /* Cores principais - Gradiente roxo/azul moderno */
+  --primary: #667eea;
+  --primary-dark: #5568d3;
+  --secondary: #764ba2;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  
+  /* Backgrounds */
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-light: #f8f9fa;
+  --bg-white: #ffffff;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.2);
+  
+  /* Animações */
+  --transition-fast: all 0.2s ease;
+  --transition-normal: all 0.3s ease;
+  --transition-slow: all 0.5s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-gradient);
+  min-height: 100vh;
+}
+
+/* ============================================================================
+   🔐 TELAS DE AUTENTICAÇÃO (Login/Register)
+   ============================================================================ */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-gradient);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efeito de bolhas flutuantes no fundo */
+.auth-container::before,
+.auth-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 20s infinite ease-in-out;
+}
+
+.auth-container::before {
+  width: 400px;
+  height: 400px;
+  top: -200px;
+  left: -200px;
+  animation-delay: 0s;
+}
+
+.auth-container::after {
+  width: 300px;
+  height: 300px;
+  bottom: -150px;
+  right: -150px;
+  animation-delay: 5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(50px, -50px) scale(1.1); }
+  50% { transform: translate(0, -100px) scale(1); }
+  75% { transform: translate(-50px, -50px) scale(0.9); }
+}
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: var(--shadow-xl);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-card h2 {
+  color: var(--primary);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.auth-card .subtitle {
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Inputs estilizados */
+.form-control {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: var(--transition-fast);
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+/* Botões modernos */
+.btn {
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: var(--transition-fast);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: var(--bg-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Alertas bonitos */
+.alert {
+  border-radius: 12px;
+  border: none;
+  padding: 12px 16px;
+  margin-bottom: 1rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.alert-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* ============================================================================
+   🏠 DASHBOARD
+   ============================================================================ */
+
+.dashboard-wrapper {
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideDown 0.5s ease-out;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  background: var(--bg-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-logout {
+  background: white;
+  color: var(--danger);
+  border: 2px solid var(--danger);
+}
+
+.btn-logout:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* ============================================================================
+   📋 CARDS DE TAREFAS
+   ============================================================================ */
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-normal);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.card-header {
+  background: transparent;
+  border: none;
+  padding: 20px 24px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.card-body {
+  padding: 24px;
+}
+
+/* ============================================================================
+   ✅ LISTA DE TAREFAS
+   ============================================================================ */
+
+.list-group-item {
+  border: none;
+  border-radius: 12px !important;
+  margin-bottom: 12px;
+  padding: 16px;
+  background: var(--bg-light);
+  transition: var(--transition-fast);
+  border-left: 4px solid transparent !important;
+}
+
+.list-group-item:hover {
+  background: #e5e7eb;
+  transform: translateX(4px);
+}
+
+.list-group-item.tarefa-concluida {
+  opacity: 0.6;
+  border-left-color: var(--success) !important;
+}
+
+.list-group-item.tarefa-pendente {
+  border-left-color: var(--primary) !important;
+}
+
+/* Checkbox customizado */
+input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  accent-color: var(--success);
+}
+
+/* Badges de prioridade */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bg-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.bg-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: white !important;
+}
+
+.bg-success {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+/* ============================================================================
+   🎯 BOTÕES DE FILTRO
+   ============================================================================ */
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  border-radius: 20px;
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary.active {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-outline-warning {
+  border: 2px solid var(--warning);
+  color: var(--warning);
+  background: transparent;
+}
+
+.btn-outline-warning:hover,
+.btn-outline-warning.active {
+  background: var(--warning);
+  color: white;
+}
+
+.btn-outline-success {
+  border: 2px solid var(--success);
+  color: var(--success);
+  background: transparent;
+}
+
+.btn-outline-success:hover,
+.btn-outline-success.active {
+  background: var(--success);
+  color: white;
+}
+
+/* ============================================================================
+   🎨 ESTATÍSTICAS (se você adicionar depois)
+   ============================================================================ */
+
+.stats-card {
+  background: var(--bg-gradient);
+  color: white;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-normal);
+}
+
+.stats-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.stats-card h3 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 12px 0;
+}
+
+.stats-card p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ============================================================================
+   📱 RESPONSIVIDADE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .auth-card {
+    padding: 24px;
+  }
+  
+  .filter-buttons {
+    justify-content: center;
+  }
+}
+
+/* ============================================================================
+   🌟 ANIMAÇÕES EXTRAS
+   ============================================================================ */
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Spinner customizado */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 4px;
+  border-color: var(--primary);
+  border-right-color: transparent;
+}
+
+/* ============================================================================
+   🎭 EFEITOS DE HOVER
+   ============================================================================ */
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  transition: var(--transition-fast);
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* Links bonitos */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* ============================================================================
+   🎪 TOASTS/NOTIFICAÇÕES (se adicionar depois)
+   ============================================================================ */
+
+.toast {
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  border: none;
+}
+
+.toast-header {
+  background: var(--bg-gradient);
+  color: white;
+  border: none;
+  border-radius: 12px 12px 0 0;
+}

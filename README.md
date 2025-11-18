@@ -15,24 +15,79 @@ Aplicação **full-stack** para gerenciamento de tarefas (To-Do List) desenvolvi
 
 ### 🌟 O Que Foi Implementado
 
-**Backend (API REST):**
-- ✅ **Autenticação JWT** - Login seguro com tokens
-- ✅ **CRUD de Tarefas** - Criar, listar, atualizar e deletar
-- ✅ **Validação de Dados** - Pydantic para validação de entrada
-- ✅ **Documentação Swagger** - API documentada automaticamente
-- ✅ **Testes Automatizados** - 12 testes com pytest
+**🔥 Backend (API REST) - Foco Principal:**
+- ✅ **Autenticação JWT** - Login seguro com tokens (Flask-JWT-Extended)
+- ✅ **CRUD Completo** - Endpoints RESTful com validação
+- ✅ **Validação Pydantic** - Schemas com tipos e constraints
+- ✅ **Documentação Swagger** - Flask-RESTX com UI interativa
+- ✅ **Testes Automatizados** - 12 testes com pytest (100% das rotas)
+- ✅ **ORM SQLAlchemy** - Migrations com Alembic
+- ✅ **PostgreSQL** - Banco de dados em produção
 
-**Frontend (Interface Web):**
-- ✅ **Dashboard Interativo** - Visualização de tarefas em tempo real
-- ✅ **Sistema de Login/Registro** - Interface de autenticação
-- ✅ **Cards de Estatísticas** - Total, pendentes e concluídas
-- ✅ **Filtros de Tarefas** - Por status (todas/pendentes/concluídas)
-- ✅ **Design Responsivo** - Bootstrap 5 com gradientes modernos
-
-**DevOps:**
+**🚀 DevOps & Infraestrutura - Destaque:**
 - ✅ **Docker** - Containerização completa (API + PostgreSQL)
-- ✅ **CI/CD** - GitHub Actions com testes automatizados
-- ✅ **Scripts de Automação** - Start, stop, test e reset
+- ✅ **CI/CD Pipeline** - GitHub Actions (Test → Build → Deploy)
+- ✅ **Azure Container Apps** - Deploy automatizado
+- ✅ **Azure PostgreSQL** - Banco gerenciado
+- ✅ **Domínio Personalizado** - SSL automático (Let's Encrypt)
+- ✅ **Health Checks** - Endpoints de monitoramento
+
+**💻 Frontend (Interface Web):**
+- ✅ **Dashboard Interativo** - Vanilla JS + Bootstrap 5
+- ✅ **Sistema de Login/Registro** - Autenticação completa
+- ✅ **Gestão de Tarefas** - CRUD completo via API
+- ✅ **Design Responsivo** - Mobile-first
+- ✅ **Versão React** - React 18 + Vite + React Bootstrap + React Router + Context API (frontend-react/)
+
+---
+
+---
+
+## 💪 Habilidades Técnicas Demonstradas
+
+### Backend & APIs
+- ✅ Python 3.9+ com Flask
+- ✅ Arquitetura REST (CRUD completo)
+- ✅ Autenticação JWT (stateless)
+- ✅ ORM SQLAlchemy com Migrations
+- ✅ Validação de dados (Pydantic V2)
+- ✅ Documentação automática (Swagger/OpenAPI)
+- ✅ Tratamento de erros e exceções
+- ✅ Segurança (bcrypt, CORS, SQL injection prevention)
+
+### DevOps & Cloud
+- ✅ Docker + Docker Compose
+- ✅ CI/CD com GitHub Actions
+- ✅ Deploy Azure Container Apps
+- ✅ Azure Database for PostgreSQL
+- ✅ Configuração de domínios personalizados
+- ✅ SSL/TLS automático
+- ✅ Environment variables e secrets management
+- ✅ Health checks e monitoramento
+
+### Testes & Qualidade
+- ✅ Testes automatizados com pytest
+- ✅ Test fixtures e mocks
+- ✅ Cobertura de código
+- ✅ Testes de integração (API + DB)
+- ✅ Testes de autenticação e autorização
+
+### Banco de Dados
+- ✅ Modelagem relacional
+- ✅ PostgreSQL em produção
+- ✅ SQLite para desenvolvimento/testes
+- ✅ Migrations versionadas
+- ✅ Relacionamentos 1:N com cascade
+
+### Frontend Moderno (React)
+- ✅ React 18 com Hooks (useState, useEffect)
+- ✅ Context API para gerenciamento de estado
+- ✅ React Router (navegação SPA)
+- ✅ React Bootstrap (componentes)
+- ✅ Axios com interceptors (JWT automático)
+- ✅ Vite (build tool moderno)
+- ✅ Formulários controlados
+- ✅ CSS moderno (gradients, animations)
 
 ---
 
