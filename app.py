@@ -207,15 +207,20 @@ def create_app(config_class='config.DevelopmentConfig'):
     # ==================
     # Por que CORS é necessário?
     # Problema: Navegadores bloqueiam requisições cross-origin (segurança)
-    # Cenário: frontend em localhost:8000 quer acessar API em localhost:5000
+    # Cenário: frontend em app.caiodev.me quer acessar API em api.caiodev.me
     # Sem CORS: Navegador bloqueia → erro "CORS policy"
     # Com CORS: Servidor diz "pode acessar" → requisição passa
     #
     # Headers que CORS adiciona:
-    # Access-Control-Allow-Origin: *  (permite qualquer origem)
+    # Access-Control-Allow-Origin: * ou domínios específicos
     # Access-Control-Allow-Methods: GET, POST, PUT, DELETE
     # Access-Control-Allow-Headers: Content-Type, Authorization
-    CORS(app)
+    # Access-Control-Allow-Credentials: true (para enviar cookies/tokens)
+    CORS(app, 
+         resources={r"/*": {"origins": "*"}},
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
     # ==================
     # 5. CONFIGURAR SWAGGER (Flask-RESTX)
