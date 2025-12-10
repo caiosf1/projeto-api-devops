@@ -21,20 +21,37 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend-nextjs/package-lock.json
+      
+      - name: Install dependencies
+        run: |
+          cd frontend-nextjs
+          npm ci
+      
+      - name: Build Next.js
+        run: |
+          cd frontend-nextjs
+          npm run build
+        env:
+          NEXT_PUBLIC_API_URL: "https://api.caiodev.me"
           
-      - name: Build And Deploy
+      - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/frontend-nextjs" # Caminho do código Next.js
+          app_location: "/frontend-nextjs/out" # Pasta já buildada
           api_location: "" # Sem API serverless (usamos Container App)
-          output_location: "out" # Pasta de export estático do Next.js
-          app_build_command: "npm run build"
-        env:
-          NEXT_PUBLIC_API_URL: "https://api.caiodev.me" # Aponta para a API no Container App
+          output_location: "" # Já está buildado
+          skip_app_build: true # Pular build do Azure (já fizemos)
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -46,4 +63,6 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "close"
+          app_location: "/"
