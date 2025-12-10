@@ -12,3 +12,4 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+// Deploy trigger: Wed Dec 10 00:13:58 -03 2025
