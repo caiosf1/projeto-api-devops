@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.API_URL || 'http://localhost:5000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.caiodev.me',
   timeout: 10000, // 10 segundos de timeout
   headers: {
     'Content-Type': 'application/json',
