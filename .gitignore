@@ -227,3 +227,5 @@ node_modules/
 
 # Scripts Backup
 scripts/secrets_backup/
+frontend-nextjs/out/
+frontend-nextjs/.next/
