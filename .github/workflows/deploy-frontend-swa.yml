@@ -31,7 +31,7 @@ jobs:
           action: "upload"
           app_location: "/frontend-nextjs" # Caminho do código Next.js
           api_location: "" # Sem API serverless (usamos Container App)
-          output_location: ".next" # Pasta de build do Next.js
+          output_location: "out" # Pasta de export estático do Next.js
           app_build_command: "npm run build"
         env:
           NEXT_PUBLIC_API_URL: "https://api.caiodev.me" # Aponta para a API no Container App
