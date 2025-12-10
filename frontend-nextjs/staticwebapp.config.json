@@ -1,0 +1,23 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*.{png,jpg,gif,ico}", "/*.{css,scss,js}"]
+  },
+  "routes": [
+    {
+      "route": "/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "platform": {
+    "apiRuntime": "node:20"
+  },
+  "globalHeaders": {
+    "cache-control": "must-revalidate, max-age=6000"
+  },
+  "mimeTypes": {
+    ".json": "application/json",
+    ".js": "text/javascript",
+    ".css": "text/css"
+  }
+}
