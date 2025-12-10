@@ -209,10 +209,19 @@ class ProductionConfig(Config):
     # Melhor falhar no startup do que rodar sem banco!
     # MAS: Só falha se estivermos realmente em produção (FLASK_ENV=production)
     # Isso evita erro ao importar config.py em desenvolvimento
-    if not db_password:
+    
+    # Suporte a DATABASE_URL direta (padrão Vercel/Neon/Supabase)
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # Corrige postgres:// para postgresql:// se necessário (SQLAlchemy requer postgresql://)
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        SQLALCHEMY_DATABASE_URI = database_url
+    elif not db_password:
         if os.getenv('FLASK_ENV') == 'production':
             raise ValueError(
-                "❌ ERRO CRÍTICO: POSTGRES_PASSWORD não está configurada!\n"
+                "❌ ERRO CRÍTICO: POSTGRES_PASSWORD ou DATABASE_URL não está configurada!\n"
                 "Configure no Azure Portal: Container Apps → Environment variables\n"
                 "Ou via Azure CLI: az containerapp update --name <app> "
                 "--set-env-vars POSTGRES_PASSWORD=<senha>"
