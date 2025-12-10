@@ -124,7 +124,7 @@ jobs:
             POSTGRES_DB=apitodo \
             POSTGRES_PORT=5432 \
             PORT=8000 \
-            CORS_ORIGIN="https://app.caiodev.me"
+            CORS_ORIGINS="https://app.caiodev.me,https://projeto-api-devops.vercel.app"
             
     - name: '✅ Verificar Deploy'
       run: |
