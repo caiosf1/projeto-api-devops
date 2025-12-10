@@ -38,6 +38,7 @@ jobs:
         run: |
           cd frontend-nextjs
           npm run build
+          cp staticwebapp.config.json out/staticwebapp.config.json
         env:
           NEXT_PUBLIC_API_URL: "https://api.caiodev.me"
 
