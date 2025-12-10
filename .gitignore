@@ -221,3 +221,9 @@ debug.log
 # Jupyter Notebooks (se usar no futuro)
 .ipynb_checkpoints/
 *.ipynb
+# Node.js
+node_modules/
+.next/
+
+# Scripts Backup
+scripts/secrets_backup/

@@ -89,7 +89,7 @@ class DevelopmentConfig(Config):
     ✅ Debugger interativo (console Python no erro)
     ⚠️  NUNCA use DEBUG=True em produção (expõe código fonte!)
     
-    SQLite:
+    # SQLite:
     -------
     Banco de dados em arquivo único (dev.db)
     ✅ Não precisa instalar PostgreSQL
@@ -98,6 +98,10 @@ class DevelopmentConfig(Config):
     ❌ Não suporta múltiplas conexões simultâneas (produção precisa PostgreSQL)
     """
     DEBUG = True
+    
+    # Reduz rounds do Bcrypt para desenvolvimento (login instantâneo)
+    # Padrão é 12 (lento para segurança). 4 é o mínimo (rápido para dev).
+    BCRYPT_LOG_ROUNDS = 4
     
     # SQLite para desenvolvimento local
     # 'sqlite:///dev.db' cria arquivo dev.db na pasta do projeto
@@ -200,17 +204,24 @@ class ProductionConfig(Config):
         # 'disable' = sem SSL (NUNCA use em produção!)
         ssl_mode = os.getenv('POSTGRES_SSL_MODE', 'prefer')
         
-        # 🔐 VALIDAÇÃO DE SEGURANÇA
-        # Falha rápido se senha não estiver configurada
-        # Melhor falhar no startup do que rodar sem banco!
-        if not db_password:
+    # 🔐 VALIDAÇÃO DE SEGURANÇA
+    # Falha rápido se senha não estiver configurada
+    # Melhor falhar no startup do que rodar sem banco!
+    # MAS: Só falha se estivermos realmente em produção (FLASK_ENV=production)
+    # Isso evita erro ao importar config.py em desenvolvimento
+    if not db_password:
+        if os.getenv('FLASK_ENV') == 'production':
             raise ValueError(
                 "❌ ERRO CRÍTICO: POSTGRES_PASSWORD não está configurada!\n"
                 "Configure no Azure Portal: Container Apps → Environment variables\n"
                 "Ou via Azure CLI: az containerapp update --name <app> "
                 "--set-env-vars POSTGRES_PASSWORD=<senha>"
             )
-        
+        else:
+            # Se não for produção, define URI inválida/vazia para não quebrar import
+            # Se alguém tentar usar ProductionConfig sem senha, vai falhar na conexão
+            SQLALCHEMY_DATABASE_URI = None
+    else:
         # 🔒 URL ENCODING
         # Por que quote_plus?
         # Senhas podem ter caracteres especiais: @, !, #, &
@@ -237,8 +248,11 @@ class ProductionConfig(Config):
                 f"postgresql://{db_user}:{db_password_encoded}@{db_server}:{db_port}/{db_name}"
                 f"?connect_timeout=60&application_name=projeto-api-devops"
             )
-
-
+            
+    # CORS - Origens permitidas em produção
+    # Deve ser configurado para o domínio do frontend (ex: https://meu-app.azurestaticapps.net)
+    # Em desenvolvimento, permite localhost:3000
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
 # ===================================================================================
 # 🗺️ MAPEAMENTO DE AMBIENTES
 # ===================================================================================

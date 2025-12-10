@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 
 # 2. Copia a lista de dependências e instala
 COPY requirements.txt .
-RUN pip install -r requirements.txt psycopg2-binary
+RUN pip install -r requirements.txt
 
 # 3. Copia a pasta de migrações
 COPY migrations/ ./migrations/
@@ -21,7 +21,7 @@ COPY . .
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
 
-EXPOSE 5000
+EXPOSE 8000
 
-# 6. Inicia a aplicação
-CMD ["python3", "run.py"]
+# 6. Inicia a aplicação com Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "run:app"]

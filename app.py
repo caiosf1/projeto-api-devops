@@ -60,6 +60,11 @@ from schemas import TarefaCreateSchema, TarefaUpdateSchema
 # 🌍 INSTÂNCIAS GLOBAIS (Padrão Application Factory)
 # ===================================================================================
 
+# 🎯 DESIGN PATTERN: SINGLETON
+# O QUE É: Garante que existe apenas UMA instância de cada extensão em toda aplicação
+# POR QUE USAR: Economiza recursos (não cria 100 conexões DB) e mantém estado consistente
+# ONDE USAR: Conexões DB, cache, gerenciadores de sessão, loggers
+#
 # Por que criar aqui e não dentro de create_app()?
 # Resposta: Para poder importar em outros arquivos (ex: models.py, tests/)
 # As extensões são inicializadas depois com .init_app(app)
@@ -74,6 +79,11 @@ migrate = Migrate()      # Migrações do banco
 # 🗄️ MODELOS DO BANCO DE DADOS (ORM)
 # ===================================================================================
 
+# 🎯 DESIGN PATTERNS: ACTIVE RECORD + REPOSITORY
+# O QUE É: Classes Python que representam tabelas SQL (mapeamento objeto-relacional)
+# POR QUE USAR: Escreve Python em vez de SQL, previne SQL Injection, banco portável
+# ONDE USAR: Qualquer projeto que precise persistir dados (usuários, produtos, posts, etc)
+#
 # O QUE É ORM?
 # Object-Relational Mapping = mapeia classes Python → tabelas SQL
 # Benefícios:
@@ -151,6 +161,11 @@ class Tarefa(db.Model):
 # 🏭 APPLICATION FACTORY (Padrão de Projeto)
 # ===================================================================================
 
+# 🎯 DESIGN PATTERN: FACTORY METHOD
+# O QUE É: Função que cria e configura objetos complexos (neste caso, a aplicação Flask)
+# POR QUE USAR: Permite múltiplos ambientes (dev/test/prod), facilita testes, evita circular imports
+# ONDE USAR: Aplicações que precisam de diferentes configurações ou múltiplas instâncias
+
 def create_app(config_class='config.DevelopmentConfig'):
     """
     Factory Function - Cria e configura instância da aplicação Flask.
@@ -193,6 +208,11 @@ def create_app(config_class='config.DevelopmentConfig'):
     # ==================
     # 3. INICIALIZAR EXTENSÕES
     # ==================
+    # 🎯 DESIGN PATTERN: DEPENDENCY INJECTION (DI)
+    # O QUE É: Passa dependências para o objeto ao invés de criar dentro dele
+    # POR QUE USAR: Facilita testes (injeta mocks), desacoplamento, flexibilidade
+    # ONDE USAR: Conexões DB, serviços externos, configurações que podem variar
+    #
     # Por que .init_app() e não passar app no construtor?
     # Resposta: Permite usar mesma instância (db, bcrypt) em múltiplas apps
     # Útil para testes (cada teste cria app separada)
@@ -216,8 +236,16 @@ def create_app(config_class='config.DevelopmentConfig'):
     # Access-Control-Allow-Methods: GET, POST, PUT, DELETE
     # Access-Control-Allow-Headers: Content-Type, Authorization
     # Access-Control-Allow-Credentials: true (para enviar cookies/tokens)
+    
+    # Obtém origens permitidas da configuração (padrão: '*')
+    # Se config_class for string, tenta pegar de app.config
+    if isinstance(config_class, str):
+        cors_origins = app.config.get('CORS_ORIGINS', '*')
+    else:
+        cors_origins = getattr(config_class, 'CORS_ORIGINS', '*')
+    
     CORS(app, 
-         resources={r"/*": {"origins": "*"}},
+         resources={r"/*": {"origins": cors_origins}},
          supports_credentials=True,
          allow_headers=["Content-Type", "Authorization"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
@@ -351,6 +379,12 @@ def create_app(config_class='config.DevelopmentConfig'):
     # ===================================================================================
     # Rotas da API
     # ===================================================================================
+    
+    # 🎯 DESIGN PATTERNS: DECORATOR + RESOURCE (RESTful)
+    # O QUE É: Decorators adicionam funcionalidades (roteamento, validação, autenticação)
+    # POR QUE USAR: Código limpo, reutilizável, separa responsabilidades
+    # ONDE USAR: Autenticação, logging, validação, rate limiting, cache
+    
     @ns_auth.route('/register')
     class RegistroResource(Resource):
         @ns_auth.expect(modelo_registro)
@@ -386,6 +420,24 @@ def create_app(config_class='config.DevelopmentConfig'):
 
             access_token = create_access_token(identity=email)
             return {'access_token': access_token}
+
+    @ns_auth.route('/me')
+    class MeResource(Resource):
+        @ns_auth.doc(security='jwt')
+        @jwt_required()
+        def get(self):
+            """Retorna os dados do usuário logado (validação de token)."""
+            email = get_jwt_identity()
+            usuario = Usuario.query.filter_by(email=email).first()
+            
+            if not usuario:
+                return {'erro': 'Usuário não encontrado'}, 404
+                
+            return {
+                'id': usuario.id,
+                'email': usuario.email,
+                'mensagem': 'Token válido'
+            }, 200
 
     # >>> corrigido: sem a barra final, rota será /tarefas (sem redirecionamento 308)
     @ns_tarefas.route('')
