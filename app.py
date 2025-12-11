@@ -244,11 +244,15 @@ def create_app(config_class='config.DevelopmentConfig'):
     else:
         cors_origins = getattr(config_class, 'CORS_ORIGINS', '*')
     
-    CORS(app, 
-         resources={r"/*": {"origins": cors_origins}},
-         supports_credentials=True,
-         allow_headers=["Content-Type", "Authorization"],
-         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+    allow_any_origin = cors_origins == ['*'] or cors_origins == '*'
+    CORS(
+        app,
+        resources={r"/*": {"origins": cors_origins if not allow_any_origin else "*"}},
+        supports_credentials=not allow_any_origin,
+        allow_headers=["Content-Type", "Authorization"],
+        expose_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    )
 
     # ==================
     # 5. CONFIGURAR SWAGGER (Flask-RESTX)

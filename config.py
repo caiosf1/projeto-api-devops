@@ -193,8 +193,12 @@ class ProductionConfig(Config):
             SQLALCHEMY_DATABASE_URI = None
             
     # CORS
-    # Adiciona domínios do usuário e Vercel por padrão
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000,https://app.caiodev.me,https://*.vercel.app').split(',')
+    # Padrão: libera para localhost, domínio do app e qualquer vercel.app
+    # Use CORS_ORIGINS="*" se quiser liberar geral (sem credentials)
+    CORS_ORIGINS = os.getenv(
+        'CORS_ORIGINS',
+        'http://localhost:3000,http://127.0.0.1:3000,https://app.caiodev.me,https://api.caiodev.me,https://*.vercel.app'
+    ).split(',')
 # ===================================================================================
 # 🗺️ MAPEAMENTO DE AMBIENTES
 # ===================================================================================
