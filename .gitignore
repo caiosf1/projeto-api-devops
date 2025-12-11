@@ -229,3 +229,7 @@ node_modules/
 scripts/secrets_backup/
 frontend-nextjs/out/
 frontend-nextjs/.next/
+
+# Arquivos com senhas
+.env*
+CREDENCIAIS*.md
