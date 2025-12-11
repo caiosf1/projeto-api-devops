@@ -513,49 +513,32 @@ def create_app(config_class='config.DevelopmentConfig'):
             return '', 204
 
     # 🗃️ INICIALIZAÇÃO DAS TABELAS NO BANCO
-    # Inicialização lazy - não falha o startup se banco não estiver pronto
-    # Essential para Container Apps com startup assíncrono!
+    # Simplificado para serverless - cria tabelas de forma rápida
     
     def init_database():
-        """Inicializa banco de dados com retry robusto."""
-        max_retries = 10
-        retry_delay = 15  # segundos
-        
+        """Inicializa banco de dados de forma simples e rápida."""
         with app.app_context():
-            for attempt in range(1, max_retries + 1):
-                try:
-                    print(f"🔄 Tentativa {attempt}/{max_retries}: Conectando no banco de dados...")
+            try:
+                print("🔄 Conectando no banco de dados...")
+                
+                # Testa conexão (SQLAlchemy 2.0 syntax)
+                from sqlalchemy import text
+                with db.engine.connect() as connection:
+                    connection.execute(text('SELECT 1'))
                     
-                    # Testa conexão primeiro (SQLAlchemy 2.0 syntax)
-                    from sqlalchemy import text
-                    with db.engine.connect() as connection:
-                        result = connection.execute(text('SELECT 1')).fetchone()
-                        if not result:
-                            raise Exception("Consulta retornou resultado vazio")
-                        
-                    print("✅ Conexão com banco estabelecida!")
+                print("✅ Conexão estabelecida!")
+                
+                # Cria tabelas
+                db.create_all()
+                print("✅ Tabelas criadas com sucesso!")
+                return True
                     
-                    # Cria tabelas
-                    db.create_all()
-                    print("✅ Tabelas criadas com sucesso!")
-                    return True
-                    
-                except Exception as e:
-                    print(f"❌ Tentativa {attempt} falhou: {e}")
-                    
-                    if attempt < max_retries:
-                        print(f"⏳ Aguardando {retry_delay}s antes da próxima tentativa...")
-                        import time
-                        time.sleep(retry_delay)
-                        retry_delay = min(retry_delay + 10, 60)  # Backoff progressivo até 60s
-                    else:
-                        print("⚠️  Todas as tentativas falharam.")
-                        print("💡 App vai iniciar sem inicialização de banco.")
-                        print("� Tabelas serão criadas na primeira requisição bem-sucedida.")
-                        return False
-        return False
+            except Exception as e:
+                print(f"⚠️ Erro ao conectar no banco: {e}")
+                print("💡 App vai iniciar sem banco. Tabelas serão criadas na primeira requisição.")
+                return False
     
-    # Tenta inicializar, mas não falha o startup
+    # Tenta inicializar (não bloqueia se falhar)
     try:
         init_database()
     except Exception as e:
