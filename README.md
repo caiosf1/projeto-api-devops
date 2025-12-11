@@ -1,9 +1,9 @@
-# 🚀 TaskMaster: Arquitetura DevOps & Fullstack Cloud-Native
+# 🚀 TaskMaster: Arquitetura Fullstack Cloud-Native (Vercel + Supabase)
 
-> **Projeto de Portfólio** desenvolvido para demonstrar competências avançadas em **Engenharia de Software**, **Cloud Computing (Azure)** e **DevOps**.
+> **Projeto de Portfólio** para demonstrar entrega ponta a ponta em **Engenharia de Software**, **Cloud** e **DevOps** usando **Vercel** e **Supabase**.
 
-[![CI/CD Pipeline](https://github.com/caiosf1/projeto-api-devops/actions/workflows/ci-cd-azure.yml/badge.svg)](https://github.com/caiosf1/projeto-api-devops/actions)
-[![Azure Container Apps](https://img.shields.io/badge/Azure-Container%20Apps-0078D4?logo=microsoftazure)](https://azure.microsoft.com/)
+[![Vercel](https://img.shields.io/badge/Hosting-Vercel-000?logo=vercel)](https://vercel.com/)
+[![Supabase](https://img.shields.io/badge/DB-Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![Python Flask](https://img.shields.io/badge/Backend-Flask-000000?logo=flask)](https://flask.palletsprojects.com/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791?logo=postgresql)](https://www.postgresql.org/)
@@ -17,10 +17,10 @@
 
 O **TaskMaster** é uma aplicação Fullstack robusta projetada para ir além do código básico. Este projeto serve como um laboratório prático para implementação de uma arquitetura **Cloud-Native** completa, focando em:
 
-1.  **Modernidade**: Uso das versões mais recentes de frameworks (Next.js 16, React 19, Tailwind v4).
-2.  **Automação**: Pipelines de CI/CD configurados para deploy contínuo.
-3.  **Qualidade de Código**: Tipagem, validação de dados (Pydantic) e componentização.
-4.  **UX/UI**: Interface moderna com Glassmorphism e animações fluidas.
+1.  **Modernidade**: Next.js 16, React 19, Tailwind v4.
+2.  **Entrega Contínua**: Deploy serverless via Vercel.
+3.  **Qualidade**: Validação (Pydantic), tipagem e componentização.
+4.  **UX/UI**: Glassmorphism com animações suaves.
 
 Este repositório demonstra minha capacidade de entregar soluções de ponta a ponta, desde o design do banco de dados até o deploy automatizado na nuvem.
 
@@ -45,12 +45,10 @@ API RESTful focada em segurança e performance.
 - **Documentação**: Swagger UI (OpenAPI) gerado automaticamente via Flask-RESTX.
 
 ### ☁️ Infraestrutura & DevOps
-- **Containerização**: Docker & Docker Compose (Multi-stage builds).
-- **Cloud Provider**: **Microsoft Azure**.
-  - Frontend: Azure Static Web Apps.
-  - Backend: Azure Container Apps (Serverless Containers).
-  - Banco de Dados: Azure Database for PostgreSQL (Flexible Server).
-- **CI/CD**: GitHub Actions para Build, Test e Deploy automáticos.
+- **Hospedagem**: Vercel (Frontend e Backend serverless).
+- **Banco de Dados**: Supabase (PostgreSQL).
+- **Containerização**: Docker & Docker Compose para desenvolvimento local.
+- **CI/CD**: Deploy automatizado pela Vercel.
 
 ---
 
@@ -105,7 +103,7 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # Instale dependências
 pip install -r requirements.txt
 
-# Configure o banco (SQLite local)
+# Configure o banco local (SQLite)
 flask db upgrade
 
 # Rode o servidor
