@@ -193,11 +193,11 @@ class ProductionConfig(Config):
             SQLALCHEMY_DATABASE_URI = None
             
     # CORS
-    # Padrão: libera para localhost, domínio do app e qualquer vercel.app
-    # Use CORS_ORIGINS="*" se quiser liberar geral (sem credentials)
+    # Padrão agora é liberar geral (*) para evitar bloqueios em produção; se quiser restringir,
+    # defina CORS_ORIGINS com lista separada por vírgula.
     CORS_ORIGINS = os.getenv(
         'CORS_ORIGINS',
-        'http://localhost:3000,http://127.0.0.1:3000,https://app.caiodev.me,https://api.caiodev.me,https://*.vercel.app'
+        '*'
     ).split(',')
 # ===================================================================================
 # 🗺️ MAPEAMENTO DE AMBIENTES

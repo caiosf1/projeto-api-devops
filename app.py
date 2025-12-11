@@ -252,6 +252,7 @@ def create_app(config_class='config.DevelopmentConfig'):
         allow_headers=["Content-Type", "Authorization"],
         expose_headers=["Content-Type", "Authorization"],
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        max_age=600,
     )
 
     # ==================
