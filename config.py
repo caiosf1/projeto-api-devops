@@ -181,37 +181,27 @@ class ProductionConfig(Config):
     """
     DEBUG = False
     
-    # Tenta obter DATABASE_URL diretamente (algumas plataformas fornecem pronto)
-    database_url = os.getenv('DATABASE_URL')
+    # Prioridade: Variáveis Individuais > DATABASE_URL
+    # Isso garante que a senha seja codificada corretamente se fornecida separadamente
+    db_password = os.getenv('POSTGRES_PASSWORD')
     
-    if database_url:
-        # Se DATABASE_URL existe, usa diretamente
-        # Exemplo: Heroku, Railway, Azure Container Apps fornecem assim
-        SQLALCHEMY_DATABASE_URI = database_url
-    else:
-        # Monta connection string a partir de variáveis individuais
-        # Usado quando você configura variáveis manualmente no Azure Portal
-        
-        db_server = os.getenv('POSTGRES_SERVER', 'localhost')
+    if db_password:
+        # Suporte a POSTGRES_HOST (comum) além de POSTGRES_SERVER
+        db_server = os.getenv('POSTGRES_SERVER', os.getenv('POSTGRES_HOST', 'localhost'))
         db_user = os.getenv('POSTGRES_USER', 'postgres')
-        db_password = os.getenv('POSTGRES_PASSWORD')  # Sem padrão (segurança!)
         db_name = os.getenv('POSTGRES_DB', 'apitodo')
         db_port = os.getenv('POSTGRES_PORT', '5432')
-        
-        # SSL Mode:
-        # 'require' = obrigatório SSL (Azure Database for PostgreSQL)
-        # 'prefer' = tenta SSL, fallback sem SSL (flexível)
-        # 'disable' = sem SSL (NUNCA use em produção!)
         ssl_mode = os.getenv('POSTGRES_SSL_MODE', 'prefer')
-        
+        database_url = None # Ignora DATABASE_URL se tiver senha explícita
+    else:
+        # Fallback para DATABASE_URL pronta
+        database_url = os.getenv('DATABASE_URL')
+
     # 🔐 VALIDAÇÃO DE SEGURANÇA
     # Falha rápido se senha não estiver configurada
     # Melhor falhar no startup do que rodar sem banco!
     # MAS: Só falha se estivermos realmente em produção (FLASK_ENV=production)
     # Isso evita erro ao importar config.py em desenvolvimento
-    
-    # Suporte a DATABASE_URL direta (padrão Vercel/Neon/Supabase)
-    database_url = os.getenv('DATABASE_URL')
     
     if database_url:
         # Corrige postgres:// para postgresql:// se necessário (SQLAlchemy requer postgresql://)
