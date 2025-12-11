@@ -18,8 +18,9 @@
 #   └─ ProductionConfig (herda Config)
 
 import os
+import socket
 from dotenv import load_dotenv
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 from sqlalchemy.pool import NullPool
 
 # ===================================================================================
@@ -158,6 +159,8 @@ class ProductionConfig(Config):
     # Tenta DATABASE_URL primeiro (padrão Vercel/Heroku/Railway)
     database_url = os.getenv('DATABASE_URL')
     
+    supabase_ipv4 = None
+
     if database_url:
         # Corrige postgres:// para postgresql:// se necessário
         if database_url.startswith("postgres://"):
@@ -167,6 +170,14 @@ class ProductionConfig(Config):
         if 'supabase.co' in database_url and 'sslmode=' not in database_url:
             separator = '&' if '?' in database_url else '?'
             database_url = f"{database_url}{separator}sslmode=require"
+
+        # Resolve IPv4 e usa hostaddr para evitar IPv6 em ambientes que não suportam
+        try:
+            parsed = urlparse(database_url)
+            if 'supabase.co' in (parsed.hostname or ''):
+                supabase_ipv4 = socket.gethostbyname(parsed.hostname)
+        except Exception:
+            supabase_ipv4 = None
 
         SQLALCHEMY_DATABASE_URI = database_url
     else:
@@ -207,18 +218,22 @@ class ProductionConfig(Config):
         '*'
     ).split(',')
 
-    # Pool para serverless: usa NullPool (conexão por requisição) para evitar exaustão de portas
+    # Pool para serverless: usa NullPool (conexão por requisição)
+    connect_args = {
+        'connect_timeout': int(os.getenv('SQLALCHEMY_CONNECT_TIMEOUT', 15)),
+        'keepalives': 1,
+        'keepalives_idle': 30,
+        'keepalives_interval': 10,
+        'keepalives_count': 3,
+    }
+
+    if supabase_ipv4:
+        connect_args['hostaddr'] = supabase_ipv4
+
     SQLALCHEMY_ENGINE_OPTIONS = {
         'poolclass': NullPool,
         'pool_pre_ping': True,
-        'connect_args': {
-            'connect_timeout': int(os.getenv('SQLALCHEMY_CONNECT_TIMEOUT', 15)),
-            # Keepalives ajudam em alguns provedores
-            'keepalives': 1,
-            'keepalives_idle': 30,
-            'keepalives_interval': 10,
-            'keepalives_count': 3,
-        },
+        'connect_args': connect_args,
     }
 # ===================================================================================
 # 🗺️ MAPEAMENTO DE AMBIENTES
