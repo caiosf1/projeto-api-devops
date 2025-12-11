@@ -43,9 +43,14 @@ htmlcov/
 .env
 .env.local
 .env.*.local
+.env.vercel.fixed
+.env.vercel.example
 secrets.json
 *.pem
 *.key
+GUIA_*.md
+DIAGNOSTICO_*.md
+CREDENCIAIS_*.md
 
 # Credenciais locais geradas por scripts
 .postgres_password
