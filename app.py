@@ -4,6 +4,7 @@
 
 # FLASK - Framework web minimalista para Python
 # Documentação: https://flask.palletsprojects.com/
+import os
 from flask import Flask, jsonify, request
 
 # Flask → Classe principal para criar aplicação web
@@ -196,7 +197,9 @@ def create_app(config_class='config.DevelopmentConfig'):
     # ==================
     # 1. CRIAR APP
     # ==================
-    app = Flask(__name__)  # __name__ = nome do módulo (usado para localizar templates/static)
+    # Em ambientes serverless (Vercel), o filesystem é read-only fora de /tmp.
+    # Definimos instance_path para /tmp para evitar erro de permissão na criação da pasta instance.
+    app = Flask(__name__, instance_path=os.getenv('FLASK_INSTANCE_PATH', '/tmp'))  # __name__ = nome do módulo (usado para localizar templates/static)
     
     # ==================
     # 2. CARREGAR CONFIGURAÇÃO
