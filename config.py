@@ -146,111 +146,53 @@ class TestingConfig(Config):
 # ===================================================================================
 class ProductionConfig(Config):
     """
-    Configurações para produção no Azure.
+    Configurações para produção (Vercel/Azure).
     
-    DEBUG = False:
-    --------------
-    ⚠️  NUNCA deixe DEBUG=True em produção!
-    ✅ Erros genéricos (não expõe código)
-    ✅ Performance otimizada
-    ✅ Logs controlados
-    
-    POSTGRESQL:
-    -----------
-    POR QUE NÃO SQLITE EM PRODUÇÃO?
-    ❌ SQLite não aguenta múltiplas conexões simultâneas
-    ❌ Não tem performance para alta carga
-    ✅ PostgreSQL suporta milhares de conexões
-    ✅ ACID completo (transações seguras)
-    ✅ Suporte oficial do Azure
-    
-    VARIÁVEIS DE AMBIENTE NO AZURE:
-    -------------------------------
-    POSTGRES_SERVER = nome-do-servidor.postgres.database.azure.com
-    POSTGRES_USER = seu_usuario
-    POSTGRES_PASSWORD = [obtida de variável de ambiente - NUNCA no código!]
-    POSTGRES_DB = nome_do_banco
-    POSTGRES_PORT = 5432 (padrão PostgreSQL)
-    POSTGRES_SSL_MODE = require (Azure obriga SSL para segurança)
-    
-    CONNECTION STRING:
-    ------------------
-    Formato: postgresql://usuario:senha@servidor:porta/banco?sslmode=require
-    Exemplo: postgresql://user:***@server.postgres.database.azure.com:5432/db?sslmode=require
-    (senha é URL-encoded automaticamente pelo quote_plus)
+    Suporta dois métodos de configuração:
+    1. DATABASE_URL completa (ex: Vercel, Heroku)
+    2. Variáveis individuais (POSTGRES_SERVER, POSTGRES_PASSWORD, etc.)
     """
     DEBUG = False
     
-    # Prioridade: Variáveis Individuais > DATABASE_URL
-    # Isso garante que a senha seja codificada corretamente se fornecida separadamente
-    db_password = os.getenv('POSTGRES_PASSWORD')
-    
-    if db_password:
-        # Suporte a POSTGRES_HOST (comum) além de POSTGRES_SERVER
-        db_server = os.getenv('POSTGRES_SERVER', os.getenv('POSTGRES_HOST', 'localhost'))
-        db_user = os.getenv('POSTGRES_USER', 'postgres')
-        db_name = os.getenv('POSTGRES_DB', 'apitodo')
-        db_port = os.getenv('POSTGRES_PORT', '5432')
-        ssl_mode = os.getenv('POSTGRES_SSL_MODE', 'prefer')
-        database_url = None # Ignora DATABASE_URL se tiver senha explícita
-    else:
-        # Fallback para DATABASE_URL pronta
-        database_url = os.getenv('DATABASE_URL')
-
-    # 🔐 VALIDAÇÃO DE SEGURANÇA
-    # Falha rápido se senha não estiver configurada
-    # Melhor falhar no startup do que rodar sem banco!
-    # MAS: Só falha se estivermos realmente em produção (FLASK_ENV=production)
-    # Isso evita erro ao importar config.py em desenvolvimento
+    # Tenta DATABASE_URL primeiro (padrão Vercel/Heroku/Railway)
+    database_url = os.getenv('DATABASE_URL')
     
     if database_url:
-        # Corrige postgres:// para postgresql:// se necessário (SQLAlchemy requer postgresql://)
+        # Corrige postgres:// para postgresql:// se necessário
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
         SQLALCHEMY_DATABASE_URI = database_url
-    elif not db_password:
-        if os.getenv('FLASK_ENV') == 'production':
-            raise ValueError(
-                "❌ ERRO CRÍTICO: POSTGRES_PASSWORD ou DATABASE_URL não está configurada!\n"
-                "Configure no Azure Portal: Container Apps → Environment variables\n"
-                "Ou via Azure CLI: az containerapp update --name <app> "
-                "--set-env-vars POSTGRES_PASSWORD=<senha>"
-            )
-        else:
-            # Se não for produção, define URI inválida/vazia para não quebrar import
-            # Se alguém tentar usar ProductionConfig sem senha, vai falhar na conexão
-            SQLALCHEMY_DATABASE_URI = None
     else:
-        # 🔒 URL ENCODING
-        # Por que quote_plus?
-        # Senhas podem ter caracteres especiais: @, !, #, &
-        # Esses caracteres quebram URL: postgres://user:p@ss@host → interpreta @ como separador
-        # quote_plus('p@ss') → 'p%40ss' (@ vira %40)
-        db_password_encoded = quote_plus(db_password)
+        # Monta a partir de variáveis individuais
+        db_server = os.getenv('POSTGRES_SERVER') or os.getenv('POSTGRES_HOST')
+        db_user = os.getenv('POSTGRES_USER', 'postgres')
+        db_password = os.getenv('POSTGRES_PASSWORD')
+        db_name = os.getenv('POSTGRES_DB', 'apitodo')
+        db_port = os.getenv('POSTGRES_PORT', '5432')
+        ssl_mode = os.getenv('POSTGRES_SSL_MODE', 'prefer')
         
-        # MONTA CONNECTION STRING
-        # Formato: driver://user:pass@host:port/db?opcoes
-        
-        if ssl_mode == 'require':
-            # Azure Database for PostgreSQL (serviço gerenciado)
-            # Requer SSL para conexões externas (segurança)
-            # connect_timeout=60 → espera 60s antes de falhar (rede lenta)
-            # application_name → identificação na monitoramento (Azure Monitor)
-            SQLALCHEMY_DATABASE_URI = (
-                f"postgresql://{db_user}:{db_password_encoded}@{db_server}:{db_port}/{db_name}"
-                f"?sslmode=require&connect_timeout=60&application_name=projeto-api-devops"
+        if db_password and db_server:
+            # Codifica senha para URL (@ vira %40, etc)
+            db_password_encoded = quote_plus(db_password)
+            
+            if ssl_mode == 'require':
+                SQLALCHEMY_DATABASE_URI = (
+                    f"postgresql://{db_user}:{db_password_encoded}@{db_server}:{db_port}/{db_name}"
+                    f"?sslmode=require&connect_timeout=60&application_name=projeto-api-devops"
+                )
+            else:
+                SQLALCHEMY_DATABASE_URI = (
+                    f"postgresql://{db_user}:{db_password_encoded}@{db_server}:{db_port}/{db_name}"
+                    f"?connect_timeout=60&application_name=projeto-api-devops"
+                )
+        elif os.getenv('FLASK_ENV') == 'production':
+            raise ValueError(
+                "❌ ERRO: Configure DATABASE_URL ou (POSTGRES_SERVER + POSTGRES_PASSWORD)"
             )
         else:
-            # Container Apps interno ou desenvolvimento sem SSL
-            # Não adiciona sslmode=require
-            SQLALCHEMY_DATABASE_URI = (
-                f"postgresql://{db_user}:{db_password_encoded}@{db_server}:{db_port}/{db_name}"
-                f"?connect_timeout=60&application_name=projeto-api-devops"
-            )
+            SQLALCHEMY_DATABASE_URI = None
             
-    # CORS - Origens permitidas em produção
-    # Deve ser configurado para o domínio do frontend (ex: https://meu-app.azurestaticapps.net)
-    # Em desenvolvimento, permite localhost:3000
+    # CORS
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
 # ===================================================================================
 # 🗺️ MAPEAMENTO DE AMBIENTES
