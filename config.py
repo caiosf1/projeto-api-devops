@@ -20,6 +20,7 @@
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
+from sqlalchemy.pool import NullPool
 
 # ===================================================================================
 # 📦 DOTENV - CARREGA VARIÁVEIS DE AMBIENTE
@@ -206,15 +207,17 @@ class ProductionConfig(Config):
         '*'
     ).split(',')
 
-    # Pool de conexões reduzido para serverless (evita "Cannot assign requested address")
+    # Pool para serverless: usa NullPool (conexão por requisição) para evitar exaustão de portas
     SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_size': int(os.getenv('SQLALCHEMY_POOL_SIZE', 1)),
-        'max_overflow': int(os.getenv('SQLALCHEMY_MAX_OVERFLOW', 0)),
-        'pool_timeout': int(os.getenv('SQLALCHEMY_POOL_TIMEOUT', 30)),
-        'pool_recycle': int(os.getenv('SQLALCHEMY_POOL_RECYCLE', 1800)),
+        'poolclass': NullPool,
         'pool_pre_ping': True,
         'connect_args': {
             'connect_timeout': int(os.getenv('SQLALCHEMY_CONNECT_TIMEOUT', 15)),
+            # Keepalives ajudam em alguns provedores
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 3,
         },
     }
 # ===================================================================================
