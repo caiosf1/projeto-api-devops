@@ -161,6 +161,12 @@ class ProductionConfig(Config):
         # Corrige postgres:// para postgresql:// se necessário
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+        # Garante sslmode=require para Supabase (evita erro de handshake/IPv6)
+        if 'supabase.co' in database_url and 'sslmode=' not in database_url:
+            separator = '&' if '?' in database_url else '?'
+            database_url = f"{database_url}{separator}sslmode=require"
+
         SQLALCHEMY_DATABASE_URI = database_url
     else:
         # Monta a partir de variáveis individuais
@@ -199,6 +205,18 @@ class ProductionConfig(Config):
         'CORS_ORIGINS',
         '*'
     ).split(',')
+
+    # Pool de conexões reduzido para serverless (evita "Cannot assign requested address")
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': int(os.getenv('SQLALCHEMY_POOL_SIZE', 1)),
+        'max_overflow': int(os.getenv('SQLALCHEMY_MAX_OVERFLOW', 0)),
+        'pool_timeout': int(os.getenv('SQLALCHEMY_POOL_TIMEOUT', 30)),
+        'pool_recycle': int(os.getenv('SQLALCHEMY_POOL_RECYCLE', 1800)),
+        'pool_pre_ping': True,
+        'connect_args': {
+            'connect_timeout': int(os.getenv('SQLALCHEMY_CONNECT_TIMEOUT', 15)),
+        },
+    }
 # ===================================================================================
 # 🗺️ MAPEAMENTO DE AMBIENTES
 # ===================================================================================
